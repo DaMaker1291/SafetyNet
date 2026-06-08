@@ -287,7 +287,9 @@ async function refreshStatus(){
     document.getElementById('statOpps').textContent=s.opportunities_evaluated||0;
     document.getElementById('statTX').textContent=s.transactions_submitted||0;
     document.getElementById('statQueue').textContent=(s.queue?.queued||0)+(s.queue?.pending_batches||0);
+    s.running ? startPolling() : stopPolling();
     const b=document.getElementById('statusBadge');
+    const runLabel=document.getElementById('cycleRunning');
     if(s.running){b.className='badge badge-yellow';b.textContent='● Running'}
     else{b.className='badge badge-green';b.textContent='● Idle'}
     document.getElementById('logCount').textContent=s.log_count+' entries';
@@ -472,11 +474,34 @@ function stopPolling(){
   polling=false;if(pollTimer){clearInterval(pollTimer);pollTimer=null}
 }
 
+async function fetchAllocation(){
+  try{
+    const d=await api('/api/allocation');
+    const b=document.getElementById('allocTable');
+    const summary=document.getElementById('allocSummary');
+    if(!d.allocations||!d.allocations.length){
+      b.innerHTML='<tr><td colspan="7" style="color:#586078;text-align:center">No allocation yet</td></tr>';
+      summary.textContent='—';return;
+    }
+    summary.textContent=`${d.allocations.length} targets · ${d.weighted_expected_apr||'?'}% expected APR`;
+    b.innerHTML=d.allocations.map((a,i)=>`<tr>
+      <td style="color:#586078">${i+1}</td>
+      <td style="font-weight:500">${a.strategy.replace(/_/g,' ')}</td>
+      <td>${a.target}</td>
+      <td style="color:#00d4aa">${a.allocation_pct.toFixed(1)}%</td>
+      <td>$${a.allocation_usd.toFixed(2)}</td>
+      <td>${a.expected_net_apr.toFixed(1)}%</td>
+      <td><span style="color:${a.risk_score<.2?'#00d4aa':a.risk_score<.35?'#fbbf24':'#ff4d6a'}">${a.risk_score.toFixed(3)}</span></td>
+    </tr>`).join('');
+  }catch(e){}
+}
+
 async function refreshAll(){
   await refreshStatus();
   await fetchLogs();
   await fetchOpportunities();
   await fetchAllOpportunities();
+  await fetchAllocation();
   await fetchWhitelist();
   await fetchMCPTools();
   await fetchGas();
@@ -492,9 +517,10 @@ async function refreshAll(){
     await fetchLogs();
     await fetchOrchestrator();
     await fetchTXHistory();
+    await fetchAllocation();
   },2000);
   // Refresh opportunities/gas less frequently
-  setInterval(()=>{fetchOpportunities();fetchGas()},10000);
+  setInterval(()=>{fetchOpportunities();fetchGas();fetchAllocation()},5000);
 })();
 </script>
 </body>

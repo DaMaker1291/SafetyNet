@@ -82,7 +82,7 @@ def run_multiple():
 
     def _run():
         global agent
-        agent = SafetyNetAgent(phase=phase)
+        agent.phase = phase
         add_log("INFO", f"Running {n} cycles (Phase {phase})...")
         agent.run_cycles(n)
         add_log("INFO", f"Completed {n} cycles")
@@ -199,7 +199,18 @@ def mcp_call():
     return jsonify(result)
 
 
-# ─── Gas Forecaster ─────────────────────────────────────────
+# ─── Allocation & History ───────────────────────────────────
+
+@app.route("/api/allocation")
+def get_allocation():
+    if agent.current_allocation:
+        return jsonify(agent.current_allocation)
+    return jsonify({"plan": "No allocation yet", "allocations": []})
+
+
+@app.route("/api/history")
+def get_history():
+    return jsonify({"cycles": agent.cycle_history[-10:]})
 
 @app.route("/api/gas/forecast")
 def gas_forecast():
