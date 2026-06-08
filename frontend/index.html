@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SafetyNet — Agent Dashboard</title>
+  <title>SafetyNet — Agent Test Console</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -13,106 +13,114 @@
       color: #e0e6f0;
       min-height: 100vh;
     }
-    .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+    .container { max-width: 1500px; margin: 0 auto; padding: 20px 24px; }
 
     /* Header */
     header {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 16px 0; border-bottom: 1px solid #1e2a45; margin-bottom: 32px;
+      padding: 12px 0; border-bottom: 1px solid #1e2a45; margin-bottom: 24px;
     }
     .logo { display: flex; align-items: center; gap: 12px; }
     .logo-icon {
-      width: 40px; height: 40px; background: linear-gradient(135deg, #00d4aa, #0088ff);
+      width: 38px; height: 38px; background: linear-gradient(135deg, #00d4aa, #0088ff);
       border-radius: 10px; display: flex; align-items: center; justify-content: center;
-      font-weight: 800; font-size: 20px; color: #fff;
+      font-weight: 800; font-size: 18px; color: #fff;
     }
-    .logo h1 { font-size: 22px; font-weight: 700; background: linear-gradient(135deg, #00d4aa, #0088ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .logo span { font-size: 13px; color: #7a8ba8; -webkit-text-fill-color: #7a8ba8; }
-    .status-badge {
-      display: flex; align-items: center; gap: 8px;
-      padding: 8px 16px; border-radius: 20px; font-size: 13px;
-      background: #0d1a2d; border: 1px solid #1e2a45;
-    }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
-    .status-dot.active { background: #00d4aa; box-shadow: 0 0 8px #00d4aa66; }
-    .status-dot.inactive { background: #ff4d6a; }
-
-    /* Stats Grid */
-    .stats-grid {
-      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;
-    }
-    .stat-card {
-      background: #111827; border: 1px solid #1e2a45; border-radius: 12px;
-      padding: 20px; transition: border-color .2s;
-    }
-    .stat-card:hover { border-color: #00d4aa44; }
-    .stat-label { font-size: 13px; color: #7a8ba8; margin-bottom: 8px; }
-    .stat-value { font-size: 28px; font-weight: 700; }
-    .stat-change { font-size: 12px; margin-top: 4px; }
-    .stat-change.up { color: #00d4aa; }
-    .stat-change.down { color: #ff4d6a; }
-
-    /* Two column layout */
-    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
-
-    /* Panel */
-    .panel {
-      background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 24px;
-    }
-    .panel h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #c8d0dc; }
-    .panel h3 { font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #9aa8c4; }
-
-    /* Chart container */
-    .chart-container { position: relative; height: 240px; }
-
-    /* Strategy list */
-    .strategy-item {
-      padding: 12px 0; border-bottom: 1px solid #1a2540;
-      display: flex; justify-content: space-between; align-items: center;
-    }
-    .strategy-item:last-child { border-bottom: none; }
-    .strategy-name { font-weight: 500; }
-    .strategy-type { font-size: 12px; color: #7a8ba8; margin-top: 2px; }
-    .strategy-conf {
-      padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;
-    }
-    .conf-high { background: #00d4aa22; color: #00d4aa; }
-    .conf-mid { background: #fbbf2422; color: #fbbf24; }
-    .conf-low { background: #ff4d6a22; color: #ff4d6a; }
-
-    /* Activity table */
-    .activity-table { width: 100%; border-collapse: collapse; }
-    .activity-table th {
-      text-align: left; font-size: 12px; color: #7a8ba8;
-      padding: 8px 12px; border-bottom: 1px solid #1a2540; font-weight: 500;
-    }
-    .activity-table td {
-      padding: 10px 12px; border-bottom: 1px solid #152040; font-size: 13px;
-    }
-    .tx-hash { font-family: monospace; color: #00d4aa; font-size: 12px; }
+    .logo h1 { font-size: 20px; font-weight: 700; color: #e0e6f0; }
+    .logo span { font-size: 12px; color: #7a8ba8; }
     .badge {
-      padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
+      padding: 6px 14px; border-radius: 16px; font-size: 12px; font-weight: 600;
     }
-    .badge.strategy { background: #0088ff22; color: #0088ff; }
-    .badge.action { background: #fbbf2422; color: #fbbf24; }
-    .badge.deploy { background: #00d4aa22; color: #00d4aa; }
+    .badge.green { background: #00d4aa22; color: #00d4aa; border: 1px solid #00d4aa44; }
+    .badge.yellow { background: #fbbf2422; color: #fbbf24; border: 1px solid #fbbf2444; }
+    .badge.red { background: #ff4d6a22; color: #ff4d6a; border: 1px solid #ff4d6a44; }
 
-    /* Agent Log */
-    .log-entry {
-      padding: 8px 0; border-bottom: 1px solid #152040;
-      font-family: monospace; font-size: 12px; color: #8a9ab8;
+    /* Layout */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+
+    .card {
+      background: #111827; border: 1px solid #1e2a45; border-radius: 10px; padding: 16px;
     }
-    .log-entry:last-child { border-bottom: none; }
-    .log-time { color: #586078; }
-    .log-info { color: #00d4aa; }
-    .log-warn { color: #fbbf24; }
+    .card h3 { font-size: 13px; color: #7a8ba8; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .card .value { font-size: 26px; font-weight: 700; }
+    .card .sub { font-size: 12px; color: #586078; margin-top: 2px; }
 
-    /* Full width panels */
-    .full-panel { margin-bottom: 24px; }
+    /* Controls */
+    .controls { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .btn {
+      padding: 8px 20px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600;
+      cursor: pointer; transition: all .15s; display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn:hover { transform: translateY(-1px); opacity: 0.9; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+    .btn-primary { background: #00d4aa; color: #0a0e1a; }
+    .btn-danger { background: #ff4d6a; color: #fff; }
+    .btn-outline { background: transparent; color: #7a8ba8; border: 1px solid #1e2a45; }
+    .btn-outline:hover { border-color: #00d4aa44; color: #e0e6f0; }
+    .btn-small { padding: 5px 12px; font-size: 12px; }
+
+    input, select {
+      background: #0d1a2d; border: 1px solid #1e2a45; border-radius: 6px;
+      padding: 8px 12px; color: #e0e6f0; font-size: 13px;
+      width: 80px;
+    }
+    input:focus, select:focus { outline: none; border-color: #00d4aa66; }
+
+    .api-url {
+      background: #0d1a2d; border: 1px solid #1e2a45; border-radius: 6px;
+      padding: 6px 12px; font-family: monospace; font-size: 12px; color: #586078;
+      flex: 1; min-width: 200px;
+    }
+
+    /* Log console */
+    .log-console {
+      background: #060a14; border: 1px solid #1e2a45; border-radius: 8px;
+      height: 320px; overflow-y: auto; font-family: 'SF Mono', 'Fira Code', monospace;
+      font-size: 12px; padding: 12px; line-height: 1.7;
+    }
+    .log-console .log-line { white-space: pre-wrap; word-break: break-all; }
+    .log-console .log-time { color: #3a4560; }
+    .log-console .log-INFO { color: #00d4aa; }
+    .log-console .log-WARN { color: #fbbf24; }
+    .log-console .log-ERROR { color: #ff4d6a; }
+
+    /* Strategy table */
+    .strategy-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .strategy-table th {
+      text-align: left; color: #586078; font-weight: 500; font-size: 11px;
+      padding: 6px 8px; border-bottom: 1px solid #1a2540; text-transform: uppercase; letter-spacing: 0.3px;
+    }
+    .strategy-table td { padding: 8px; border-bottom: 1px solid #152040; }
+    .conf-bar { height: 4px; border-radius: 4px; margin-top: 4px; }
+    .tx-hash { font-family: monospace; color: #00d4aa; font-size: 11px; }
+
+    /* Weight sliders */
+    .weight-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .weight-row label { width: 140px; font-size: 12px; color: #9aa8c4; }
+    .weight-row input[type="range"] { flex: 1; -webkit-appearance: none; height: 4px; border-radius: 2px; background: #1e2a45; outline: none; }
+    .weight-row input[type="range"]::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #00d4aa; cursor: pointer; }
+    .weight-row .val { width: 40px; text-align: right; font-size: 13px; font-weight: 600; color: #00d4aa; }
+
+    /* Chart */
+    .chart-wrap { position: relative; height: 180px; }
+    .chart-wrap-sm { position: relative; height: 120px; }
+
+    .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+    .tab {
+      padding: 6px 16px; border-radius: 6px; font-size: 12px; font-weight: 500;
+      cursor: pointer; background: #0d1a2d; color: #586078; border: 1px solid transparent;
+    }
+    .tab.active { background: #1e2a45; color: #e0e6f0; border-color: #2a3a5a; }
+
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+    .gap { gap: 8px; }
+    .mt-2 { margin-top: 12px; }
 
     @media (max-width: 900px) {
-      .stats-grid { grid-template-columns: repeat(2, 1fr); }
-      .two-col { grid-template-columns: 1fr; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .grid-2, .grid-3 { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -120,203 +128,296 @@
   <div class="container">
     <header>
       <div class="logo">
-        <div class="logo-icon">A</div>
-        <div>
-          <h1>SafetyNet</h1>
-          <span>Autonomous Agent Framework · Casper Network</span>
-        </div>
+        <div class="logo-icon">S</div>
+        <div><h1>SafetyNet</h1><span>Agent Test Console</span></div>
       </div>
-      <div class="status-badge">
-        <span class="status-dot active" id="statusDot"></span>
-        <span id="statusText">Agent Running</span>
-        <span style="color:#586078;margin-left:8px;" id="lastUpdate">--</span>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span class="api-url" id="apiUrlDisplay">http://localhost:5000</span>
+        <input type="number" id="portInput" value="5100" style="width:70px;" placeholder="Port">
+        <button class="btn btn-small btn-outline" onclick="updatePort()">Connect</button>
+        <span class="badge green" id="statusBadge">● Idle</span>
       </div>
     </header>
 
     <!-- Stats -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-label">CSPR Price</div>
-        <div class="stat-value" id="csprPrice">$0.0000</div>
-        <div class="stat-change up" id="csprChange">+0.00%</div>
+    <div class="grid-4">
+      <div class="card"><h3>Total Cycles</h3><div class="value" id="statCycles">0</div></div>
+      <div class="card"><h3>Strategies Generated</h3><div class="value" id="statStrategies">0</div></div>
+      <div class="card"><h3>CSPR Price</h3><div class="value" id="statPrice">$--</div><div class="sub" id="statSentiment">Sentiment: --</div></div>
+      <div class="card"><h3>Status</h3><div class="value" id="statStatus" style="font-size:18px;">Idle</div></div>
+    </div>
+
+    <!-- Controls -->
+    <div class="card" style="margin-bottom:16px;">
+      <div class="flex-between" style="margin-bottom:8px;">
+        <h3 style="text-transform:none;letter-spacing:0;font-size:14px;">Agent Controls</h3>
       </div>
-      <div class="stat-card">
-        <div class="stat-label">Active Strategies</div>
-        <div class="stat-value" id="activeStrategies">0</div>
-        <div class="stat-change" id="strategyChange" style="color:#7a8ba8;">Last 24h</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">On-Chain Actions</div>
-        <div class="stat-value" id="onChainActions">0</div>
-        <div class="stat-change" id="actionChange" style="color:#7a8ba8;">Total recorded</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-label">Agent Confidence</div>
-        <div class="stat-value" id="agentConfidence">0%</div>
-        <div class="stat-change up" id="confidenceChange">--</div>
+      <div class="controls">
+        <button class="btn btn-primary" onclick="runCycle()">▶ Run 1 Cycle</button>
+        <button class="btn btn-primary" onclick="runMultiple()">▶▶ Run</button>
+        <input type="number" id="cycleCount" value="5" min="1" max="50" style="width:60px;">
+        <span style="color:#586078;font-size:12px;">cycles</span>
+        <span style="color:#586078;font-size:12px;">with</span>
+        <input type="number" id="cycleDelay" value="0.5" min="0" max="5" step="0.1" style="width:60px;">
+        <span style="color:#586078;font-size:12px;">s delay</span>
+        <button class="btn btn-danger" onclick="stopAgent()">■ Stop</button>
+        <button class="btn btn-outline" onclick="clearLogs()">Clear Log</button>
+        <button class="btn btn-outline" onclick="refreshMarket()">↻ Refresh Market</button>
       </div>
     </div>
 
-    <!-- Charts + Strategies -->
-    <div class="two-col">
-      <div class="panel">
-        <h2>Market Overview</h2>
-        <div class="chart-container">
-          <canvas id="marketChart"></canvas>
+    <!-- Main grid: Log + Charts -->
+    <div class="grid-2">
+      <!-- Left: Log Console -->
+      <div class="card">
+        <div class="flex-between" style="margin-bottom:8px;">
+          <h3 style="text-transform:none;letter-spacing:0;font-size:14px;">Agent Decision Log</h3>
+          <span style="color:#586078;font-size:11px;" id="logCount">0 entries</span>
+        </div>
+        <div class="log-console" id="logConsole">
+          <div class="log-line"><span class="log-time">[--:--:--]</span> <span class="log-INFO">Ready — click "Run 1 Cycle" to test the agent</span></div>
         </div>
       </div>
-      <div class="panel">
-        <h2>Strategy Portfolio</h2>
-        <div id="strategyList">
-          <div class="strategy-item">
-            <div>
-              <div class="strategy-name">Yield Optimizer</div>
-              <div class="strategy-type">DeFi · CSPR/USDC</div>
-            </div>
-            <span class="strategy-conf conf-high">92%</span>
-          </div>
-          <div class="strategy-item">
-            <div>
-              <div class="strategy-name">Liquidity Provision</div>
-              <div class="strategy-type">AMM · CSPR Pool</div>
-            </div>
-            <span class="strategy-conf conf-mid">74%</span>
-          </div>
-          <div class="strategy-item">
-            <div>
-              <div class="strategy-name">Arbitrage Detection</div>
-              <div class="strategy-type">Multi-DEX</div>
-            </div>
-            <span class="strategy-conf conf-low">45%</span>
-          </div>
-          <div class="strategy-item">
-            <div>
-              <div class="strategy-name">Risk Rebalancing</div>
-              <div class="strategy-type">Portfolio Hedge</div>
-            </div>
-            <span class="strategy-conf conf-mid">68%</span>
-          </div>
-          <div class="strategy-item">
-            <div>
-              <div class="strategy-name">RWA Collateralization</div>
-              <div class="strategy-type">Real Estate Token</div>
-            </div>
-            <span class="strategy-conf conf-low">32%</span>
-          </div>
+
+      <!-- Right: Market Chart + Strategy Weights -->
+      <div>
+        <div class="card" style="margin-bottom:12px;">
+          <h3 style="text-transform:none;letter-spacing:0;font-size:14px;">Market Overview</h3>
+          <div class="chart-wrap"><canvas id="marketChart"></canvas></div>
+        </div>
+        <div class="card">
+          <h3 style="text-transform:none;letter-spacing:0;font-size:14px;">Strategy Weights <span style="font-weight:400;color:#586078;font-size:11px;">(drag to tune)</span></h3>
+          <div id="weightControls"></div>
         </div>
       </div>
     </div>
 
-    <!-- Recent Activity + Agent Log -->
-    <div class="two-col">
-      <div class="panel">
-        <h2>Recent On-Chain Activity</h2>
-        <table class="activity-table">
+    <!-- Strategy History -->
+    <div class="card" style="margin-top:12px;">
+      <div class="flex-between" style="margin-bottom:8px;">
+        <h3 style="text-transform:none;letter-spacing:0;font-size:14px;">Strategy History</h3>
+        <span style="color:#586078;font-size:11px;" id="stratCount">0 results</span>
+      </div>
+      <div style="overflow-x:auto;">
+        <table class="strategy-table">
           <thead>
-            <tr><th>Type</th><th>Strategy</th><th>TX Hash</th><th>Time</th></tr>
+            <tr><th>#</th><th>Strategy</th><th>Confidence</th><th>Market Regime</th><th>TX Hash</th><th>Status</th></tr>
           </thead>
-          <tbody id="activityBody">
-            <tr><td><span class="badge strategy">STRATEGY</span></td><td>Yield Optimizer</td><td class="tx-hash">0x1a2b...c3d4</td><td>2 min ago</td></tr>
-            <tr><td><span class="badge action">ACTION</span></td><td>Rebalance</td><td class="tx-hash">0x4e5f...g6h7</td><td>15 min ago</td></tr>
-            <tr><td><span class="badge deploy">DEPLOY</span></td><td>Agent Registration</td><td class="tx-hash">0x8i9j...k0l1</td><td>1 hr ago</td></tr>
+          <tbody id="strategyBody">
+            <tr><td colspan="6" style="color:#586078;text-align:center;">No cycles run yet</td></tr>
           </tbody>
         </table>
       </div>
-      <div class="panel">
-        <h2>Agent Decision Log</h2>
-        <div id="agentLog">
-          <div class="log-entry"><span class="log-time">[12:34:22]</span> <span class="log-info">INFO</span> Market snapshot fetched — CSPR $0.0421</div>
-          <div class="log-entry"><span class="log-time">[12:34:23]</span> <span class="log-info">INFO</span> Strategy inference complete — recommending yield_optimizer</div>
-          <div class="log-entry"><span class="log-time">[12:34:25]</span> <span class="log-info">INFO</span> Strategy submitted to AgentVault — tx: 0x1a2b...c3d4</div>
-          <div class="log-entry"><span class="log-time">[12:34:26]</span> <span class="log-info">INFO</span> Action recorded on-chain — tx: 0x4e5f...g6h7</div>
-          <div class="log-entry"><span class="log-time">[11:34:22]</span> <span class="log-warn">WARN</span> Slippage exceeded threshold — adjusting parameters</div>
-        </div>
-      </div>
     </div>
-
-    <!-- Footer -->
-    <footer style="text-align:center;padding:32px 0 16px;border-top:1px solid #1e2a45;margin-top:16px;">
-      <p style="color:#586078;font-size:13px;">
-        SafetyNet · Built for Casper Buildathon 2025 ·
-        <a href="#" style="color:#00d4aa;text-decoration:none;">GitHub</a> ·
-        <a href="#" style="color:#00d4aa;text-decoration:none;">CSPR.fans</a>
-      </p>
-    </footer>
   </div>
 
   <script>
-    // Market chart
-    const ctx = document.getElementById('marketChart').getContext('2d');
-    const labels = Array.from({length: 24}, (_, i) => `${i}h`);
-    const prices = [0.038, 0.039, 0.037, 0.036, 0.038, 0.040, 0.042, 0.041, 0.040, 0.039, 0.041, 0.043, 0.042, 0.044, 0.043, 0.042, 0.041, 0.043, 0.045, 0.044, 0.043, 0.042, 0.041, 0.042];
-    const volumes = [120, 145, 98, 112, 156, 178, 142, 134, 121, 109, 145, 167, 151, 143, 132, 125, 140, 158, 172, 149, 137, 128, 119, 134];
+    let API = "http://localhost:5100";
+    let marketChart = null;
+    let priceHistory = [];
+    let logSince = 0;
+    let pollTimer = null;
 
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [
-          {
-            label: 'CSPR Price (USD)',
-            data: prices,
-            borderColor: '#00d4aa',
-            backgroundColor: 'rgba(0,212,170,0.08)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 2,
-            borderWidth: 2,
-            yAxisID: 'y',
-          },
-          {
-            label: 'Volume (k CSPR)',
-            data: volumes,
-            borderColor: '#0088ff',
-            backgroundColor: 'rgba(0,136,255,0.08)',
-            fill: true,
-            tension: 0.4,
-            pointRadius: 2,
-            borderWidth: 2,
-            yAxisID: 'y1',
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            labels: { color: '#7a8ba8', font: { size: 11 } }
-          }
-        },
-        scales: {
-          x: { ticks: { color: '#586078', font: { size: 10 } }, grid: { color: '#1a2540' } },
-          y: { ticks: { color: '#586078', font: { size: 10 } }, grid: { color: '#1a2540' }, position: 'left' },
-          y1: { ticks: { color: '#586078', font: { size: 10 } }, grid: { display: false }, position: 'right' }
-        }
-      }
-    });
-
-    // Simulate live updates
-    function updateStats() {
-      const price = (0.038 + Math.random() * 0.012).toFixed(4);
-      document.getElementById('csprPrice').textContent = `$${price}`;
-
-      const strategies = Math.floor(Math.random() * 8) + 3;
-      document.getElementById('activeStrategies').textContent = strategies;
-
-      const actions = Math.floor(Math.random() * 50) + 20;
-      document.getElementById('onChainActions').textContent = actions;
-
-      const conf = (Math.floor(Math.random() * 30) + 65);
-      document.getElementById('agentConfidence').textContent = `${conf}%`;
-
-      const now = new Date();
-      document.getElementById('lastUpdate').textContent =
-        now.toLocaleTimeString();
+    function api(path, opts = {}) {
+      return fetch(API + path, {
+        headers: { "Content-Type": "application/json" },
+        ...opts,
+      }).then(r => r.json());
     }
 
-    setInterval(updateStats, 5000);
-    updateStats();
+    async function refreshStatus() {
+      const s = await api("/api/status");
+      document.getElementById("statCycles").textContent = s.cycles;
+      document.getElementById("statStrategies").textContent = s.strategies;
+      document.getElementById("logCount").textContent = s.log_count + " entries";
+      document.getElementById("stratCount").textContent = s.strategies + " results";
+      const badge = document.getElementById("statusBadge");
+      const statusText = document.getElementById("statStatus");
+      if (s.running) {
+        badge.className = "badge yellow";
+        badge.textContent = "● Running";
+        statusText.textContent = "Running";
+        statusText.style.color = "#fbbf24";
+      } else {
+        badge.className = "badge green";
+        badge.textContent = "● Idle";
+        statusText.textContent = "Idle";
+        statusText.style.color = "#7a8ba8";
+      }
+    }
+
+    async function refreshMarket() {
+      const m = await api("/api/market");
+      document.getElementById("statPrice").textContent = "$" + m.cspr_price_usd.toFixed(4);
+      document.getElementById("statSentiment").textContent = "Sentiment: " + (m.sentiment * 100).toFixed(0) + "%";
+      priceHistory.push({ time: new Date().toLocaleTimeString(), price: m.cspr_price_usd });
+      if (priceHistory.length > 30) priceHistory.shift();
+      updateChart();
+    }
+
+    function updateChart() {
+      if (!marketChart) return;
+      marketChart.data.labels = priceHistory.map(p => p.time);
+      marketChart.data.datasets[0].data = priceHistory.map(p => p.price);
+      marketChart.update("none");
+    }
+
+    async function fetchLogs() {
+      const logs = await api("/api/logs?since=" + logSince);
+      if (logs.length === 0) return;
+      logSince += logs.length;
+      const console = document.getElementById("logConsole");
+      logs.forEach(l => {
+        const div = document.createElement("div");
+        div.className = "log-line";
+        div.innerHTML = `<span class="log-time">[${l.time}]</span> <span class="log-${l.level}">${l.msg}</span>`;
+        console.appendChild(div);
+      });
+      console.scrollTop = console.scrollHeight;
+    }
+
+    async function fetchStrategies() {
+      const list = await api("/api/strategies");
+      const body = document.getElementById("strategyBody");
+      if (list.length === 0) {
+        body.innerHTML = '<tr><td colspan="6" style="color:#586078;text-align:center;">No cycles run yet</td></tr>';
+        return;
+      }
+      body.innerHTML = list.map((s, i) => {
+        const confPct = (s.confidence * 100).toFixed(1);
+        const confColor = confPct > 70 ? "#00d4aa" : confPct > 40 ? "#fbbf24" : "#ff4d6a";
+        const regimeColor = s.regime === "bullish" ? "#00d4aa" : s.regime === "bearish" ? "#ff4d6a" : s.regime === "volatile" ? "#fbbf24" : "#586078";
+        const tx = s.tx_hash ? s.tx_hash.substring(0, 10) + "..." : "demo";
+        return `<tr>
+          <td style="color:#586078;">${s.cycle || i+1}</td>
+          <td style="font-weight:500;">${s.strategy.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase())}</td>
+          <td><span style="color:${confColor};font-weight:600;">${confPct}%</span><div class="conf-bar" style="width:${confPct}%;background:${confColor};"></div></td>
+          <td><span style="color:${regimeColor};">●</span> ${s.regime.charAt(0).toUpperCase() + s.regime.slice(1)}</td>
+          <td class="tx-hash">${tx}</td>
+          <td><span class="badge green" style="font-size:10px;padding:2px 8px;">${s.status || "OK"}</span></td>
+        </tr>`;
+      }).join("");
+    }
+
+    async function loadWeights() {
+      const w = await api("/api/config");
+      const ctrl = document.getElementById("weightControls");
+      ctrl.innerHTML = Object.entries(w).map(([key, val]) => {
+        const label = key.replace(/_/g, " ").replace(/\b\w/g, c => c.toUpperCase());
+        return `<div class="weight-row">
+          <label>${label}</label>
+          <input type="range" min="0" max="1" step="0.01" value="${val}" data-key="${key}" oninput="updateWeight(this)">
+          <span class="val" id="w_${key}">${(val * 100).toFixed(0)}%</span>
+        </div>`;
+      }).join("");
+    }
+
+    async function updateWeight(el) {
+      const key = el.dataset.key;
+      const val = parseFloat(el.value);
+      document.getElementById("w_" + key).textContent = (val * 100).toFixed(0) + "%";
+      await api("/api/config", {
+        method: "POST",
+        body: JSON.stringify({ weights: { [key]: val } }),
+      });
+    }
+
+    async function runCycle() {
+      const r = await api("/api/cycle", { method: "POST" });
+      if (r.success) {
+        await refreshStatus();
+        await fetchLogs();
+        await fetchStrategies();
+        await refreshMarket();
+      } else {
+        alert("Error: " + (r.error || "unknown"));
+      }
+    }
+
+    async function runMultiple() {
+      const count = document.getElementById("cycleCount").value;
+      const delay = document.getElementById("cycleDelay").value;
+      const r = await api("/api/cycles", {
+        method: "POST",
+        body: JSON.stringify({ count: parseInt(count), delay: parseFloat(delay) }),
+      });
+      if (r.success) {
+        startPolling();
+      }
+    }
+
+    async function stopAgent() {
+      await api("/api/stop", { method: "POST" });
+      stopPolling();
+      await refreshStatus();
+      await fetchLogs();
+    }
+
+    function clearLogs() {
+      document.getElementById("logConsole").innerHTML = '<div class="log-line"><span class="log-time">[--:--:--]</span> <span class="log-INFO">Log cleared</span></div>';
+      logSince = 0;
+      document.getElementById("logCount").textContent = "0 entries";
+    }
+
+    let polling = false;
+    function startPolling() {
+      if (polling) return;
+      polling = true;
+      pollTimer = setInterval(async () => {
+        await refreshStatus();
+        await fetchLogs();
+        await fetchStrategies();
+        await refreshMarket();
+        const s = await api("/api/status");
+        if (!s.running) { stopPolling(); }
+      }, 800);
+    }
+    function stopPolling() {
+      polling = false;
+      if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+    }
+
+    // Init chart
+    function initChart() {
+      const ctx = document.getElementById("marketChart").getContext("2d");
+      marketChart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: [],
+          datasets: [{
+            label: "CSPR Price (USD)",
+            data: [],
+            borderColor: "#00d4aa",
+            backgroundColor: "rgba(0,212,170,0.1)",
+            fill: true, tension: 0.3, pointRadius: 3, borderWidth: 2,
+          }]
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false } },
+          scales: {
+            x: { ticks: { color: "#586078", font: { size: 9 }, maxTicksLimit: 8 }, grid: { color: "#1a2540" } },
+            y: { ticks: { color: "#586078", font: { size: 9 } }, grid: { color: "#1a2540" } },
+          }
+        }
+      });
+    }
+
+    function updatePort() {
+      const port = document.getElementById("portInput").value;
+      API = "http://localhost:" + port;
+      document.getElementById("apiUrlDisplay").textContent = API;
+      init();
+    }
+
+    async function init() {
+      initChart();
+      await loadWeights();
+      await refreshMarket();
+      await refreshStatus();
+    }
+
+    init();
   </script>
 </body>
 </html>
