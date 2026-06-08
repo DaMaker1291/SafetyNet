@@ -4,7 +4,7 @@
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 [![Built for Buildathon](https://img.shields.io/badge/Built%20for-Casper%20Buildathon%202025-0088ff)](#)
 
-> **SafetyNet** is an autonomous AI agent framework that analyzes market conditions, generates DeFi strategies, and executes them on the Casper blockchain — all without human intervention. Built for the Casper Buildathon 2025 at the intersection of **Agentic AI**, **DeFi**, and **Real-World Assets (RWA)**.
+> **SafetyNet v2** is a high-frequency autonomous yield-routing engine for the Casper Network. It implements an **MCP Server** bridging Casper nodes to LLMs, a **multi-layer risk engine** with stress testing, a **heuristic APR/APY strategy engine**, and a **transaction orchestrator** with gas-optimized batching. Built for the Casper Agentic Buildathon 2026 at the intersection of **Agentic AI**, **DeFi**, and **Real-World Assets (RWA)**.
 
 ---
 
