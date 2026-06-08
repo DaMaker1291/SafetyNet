@@ -1,6 +1,6 @@
 # AgentVault — Casper Smart Contract
 
-The on-chain registry and execution layer for AETHOS autonomous agents.
+The on-chain registry and execution layer for SafetyNet autonomous agents.
 
 ## Build
 

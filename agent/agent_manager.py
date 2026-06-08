@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""AETHOS Agent Manager — orchestrates the full AI agent loop.
+"""SafetyNet Agent Manager — orchestrates the full AI agent loop.
 
 The agent:
   1. Fetches market data (MarketAgent)
@@ -42,7 +42,7 @@ logging.basicConfig(
     format="%(asctime)s | %(levelname)-8s | %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
 )
-log = logging.getLogger("aethos")
+log = logging.getLogger("safetynet")
 
 
 class AgentManager:
@@ -66,7 +66,7 @@ class AgentManager:
     def initialize(self) -> bool:
         """Register the agent on-chain if not already registered."""
         console.print(Panel.fit(
-            "[bold cyan]AETHOS Agent v1.0[/bold cyan]\n"
+            "[bold cyan]SafetyNet Agent v1.0[/bold cyan]\n"
             "[dim]Autonomous DeFi Agent for Casper Network[/dim]"
         ))
 

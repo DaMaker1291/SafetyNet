@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# AETHOS — Test Agent Script
+# SafetyNet — Test Agent Script
 # Runs the AI agent locally in demo mode (3 cycles)
 # ============================================================
 set -euo pipefail
@@ -10,7 +10,7 @@ PROJECT_DIR="$(dirname "$SCRIPT_DIR")"
 AGENT_DIR="$PROJECT_DIR/agent"
 
 echo "=============================================="
-echo " AETHOS — Agent Test Run"
+echo " SafetyNet — Agent Test Run"
 echo "=============================================="
 echo ""
 

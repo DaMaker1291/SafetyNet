@@ -1,4 +1,4 @@
-# AETHOS — Demo Video Script
+# SafetyNet — Demo Video Script
 
 **Duration**: ~8 minutes
 
@@ -10,7 +10,7 @@
 **[Audio: Upbeat tech background music]**
 
 **Narrator:**
-"Meet AETHOS — the first autonomous AI agent framework built for the Casper Network. AETHOS is an agentic AI system that continuously monitors the Casper ecosystem, analyzes market conditions, generates DeFi strategies, and executes them on-chain — all without human intervention.
+"Meet SafetyNet — the first autonomous AI agent framework built for the Casper Network. SafetyNet is an agentic AI system that continuously monitors the Casper ecosystem, analyzes market conditions, generates DeFi strategies, and executes them on-chain — all without human intervention.
 
 Built for the Casper Buildathon 2025 at the intersection of Agentic AI, Decentralized Finance, and Real-World Assets."
 
@@ -23,7 +23,7 @@ Built for the Casper Buildathon 2025 at the intersection of Agentic AI, Decentra
 "Narrator:
 "DeFi moves 24/7. Human traders can't watch the markets all the time. Emotional decisions lead to poor outcomes. And once you decide on a strategy, there's no transparent record of why or when it was executed.
 
-AETHOS solves all of this with an autonomous AI agent that:
+SafetyNet solves all of this with an autonomous AI agent that:
 - Never sleeps — 24/7 market monitoring
 - Makes data-driven decisions — no emotions, no bias
 - Records everything on-chain — complete transparency
@@ -36,7 +36,7 @@ AETHOS solves all of this with an autonomous AI agent that:
 **[Visual: Architecture diagram animating in]**
 
 "Narrator:
-"AETHOS has four layers:
+"SafetyNet has four layers:
 
 First, the **Market Agent** fetches real-time data — CSPR price from CoinGecko, network stats from the Casper node, on-chain transaction volume, and sentiment signals.
 
@@ -127,7 +127,7 @@ Phase 1 is the Buildathon submission — working smart contract, AI agent, and d
 
 Phase 2: Mainnet deployment, integration with real Casper DeFi protocols like CSPR.fans and CasperSwap, RWA oracle integration, and community voting support.
 
-Phase 3: Reinforcement learning for self-optimizing strategies, decentralized governance via DAO, and an open marketplace where anyone can deploy their own AETHOS agent.
+Phase 3: Reinforcement learning for self-optimizing strategies, decentralized governance via DAO, and an open marketplace where anyone can deploy their own SafetyNet agent.
 
 We're building the autonomous agent layer for the Casper ecosystem."
 
@@ -140,11 +140,11 @@ We're building the autonomous agent layer for the Casper ecosystem."
 "Narrator:
 "Check out our GitHub repo for the full source code. Vote for us on CSPR.fans. Join our Discord to be part of the journey.
 
-AETHOS — Autonomous AI for the Casper Network.
+SafetyNet — Autonomous AI for the Casper Network.
 
 Thank you."
 
-**[Visual: Fade to black with "AETHOS" logo and "Built for Casper Buildathon 2025"]**
+**[Visual: Fade to black with "SafetyNet" logo and "Built for Casper Buildathon 2025"]**
 
 ---
 
@@ -155,4 +155,4 @@ Thank you."
 - **Dashboard**: Open `frontend/index.html` in Chrome in fullscreen
 - **Audio**: Clear narration + low background music (fade during narration)
 - **Captions**: Add English subtitles
-- **Thumbnail**: AETHOS logo on dark background with "AI Agent for Casper DeFi"
+- **Thumbnail**: SafetyNet logo on dark background with "AI Agent for Casper DeFi"

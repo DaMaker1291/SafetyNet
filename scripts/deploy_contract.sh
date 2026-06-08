@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ============================================================
-# AETHOS — AgentVault Contract Deploy Script
+# SafetyNet — AgentVault Contract Deploy Script
 # Deploys the AgentVault smart contract to Casper Testnet
 # ============================================================
 set -euo pipefail
@@ -24,7 +24,7 @@ fi
 
 # ---------- Build Contract ----------
 echo "=============================================="
-echo " AETHOS — AgentVault Deploy"
+echo " SafetyNet — AgentVault Deploy"
 echo "=============================================="
 echo ""
 echo "Building contract..."

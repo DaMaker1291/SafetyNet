@@ -1,10 +1,10 @@
-# AETHOS — Autonomous AI Agent Framework for Casper DeFi & RWA
+# SafetyNet — Autonomous AI Agent Framework for Casper DeFi & RWA
 
 [![Casper Testnet](https://img.shields.io/badge/Casper-Testnet-00d4aa)](https://testnet.cspr.live)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
 [![Built for Buildathon](https://img.shields.io/badge/Built%20for-Casper%20Buildathon%202025-0088ff)](#)
 
-> **AETHOS** is an autonomous AI agent framework that analyzes market conditions, generates DeFi strategies, and executes them on the Casper blockchain — all without human intervention. Built for the Casper Buildathon 2025 at the intersection of **Agentic AI**, **DeFi**, and **Real-World Assets (RWA)**.
+> **SafetyNet** is an autonomous AI agent framework that analyzes market conditions, generates DeFi strategies, and executes them on the Casper blockchain — all without human intervention. Built for the Casper Buildathon 2025 at the intersection of **Agentic AI**, **DeFi**, and **Real-World Assets (RWA)**.
 
 ---
 
@@ -27,7 +27,7 @@
 
 ## Overview
 
-AETHOS is an autonomous agent system that:
+SafetyNet is an autonomous agent system that:
 
 1. **Monitors** the Casper ecosystem (market data, on-chain activity, sentiment)
 2. **Analyzes** conditions using AI/ML to identify optimal DeFi strategies
@@ -35,9 +35,9 @@ AETHOS is an autonomous agent system that:
 4. **Executes** via Casper smart contracts — every strategy and action is recorded on-chain
 5. **Learns** from outcomes to improve future decisions
 
-### Why AETHOS?
+### Why SafetyNet?
 
-| Problem | AETHOS Solution |
+| Problem | SafetyNet Solution |
 |---|---|
 | DeFi requires constant monitoring | 24/7 autonomous agent never sleeps |
 | Human emotional bias in trading | AI-driven, data-backed decisions |
@@ -51,7 +51,7 @@ AETHOS is an autonomous agent system that:
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                    AETHOS Architecture                       │
+│                    SafetyNet Architecture                       │
 ├─────────────────────────────────────────────────────────────┤
 │                                                              │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐  │
@@ -96,7 +96,7 @@ AETHOS is an autonomous agent system that:
 
 ## Smart Contract: AgentVault
 
-The `AgentVault` contract is deployed on **Casper Testnet** and serves as the on-chain backbone for AETHOS.
+The `AgentVault` contract is deployed on **Casper Testnet** and serves as the on-chain backbone for SafetyNet.
 
 ### Entry Points
 
@@ -201,7 +201,7 @@ The agent runs in a continuous loop:
 
 ## Dashboard
 
-The AETHOS dashboard provides real-time visibility into agent operations:
+The SafetyNet dashboard provides real-time visibility into agent operations:
 
 - **Market Overview** — CSPR price chart with volume overlay
 - **Strategy Portfolio** — Current strategy allocations with confidence scores
@@ -226,8 +226,8 @@ Open `frontend/index.html` in any browser to view the dashboard.
 
 ```bash
 # Clone the repository
-git clone https://github.com/your-org/aethos
-cd aethos
+git clone https://github.com/DaMaker1291/SafetyNet
+cd SafetyNet
 
 # Set up environment
 cp .env.example .env
@@ -302,7 +302,7 @@ python -m pytest test_market_agent.py test_strategy_agent.py -v
 A walkthrough video is available at: **[YouTube Link — coming soon]**
 
 The video covers:
-1. **Project Overview** (1 min) — What AETHOS is and why it matters
+1. **Project Overview** (1 min) — What SafetyNet is and why it matters
 2. **Architecture** (1 min) — How the components fit together
 3. **Smart Contract Demo** (2 min) — Deploying and interacting with AgentVault on Testnet
 4. **AI Agent Demo** (2 min) — Running the agent, seeing it analyze and submit strategies
@@ -338,10 +338,10 @@ See [`VIDEO_SCRIPT.md`](./VIDEO_SCRIPT.md) for the full script.
 
 ## Community & Socials
 
-- **Twitter/X**: [@AethosCasper](https://twitter.com)
+- **Twitter/X**: [@SafetyNetCasper](https://twitter.com)
 - **Discord**: [Join our server](https://discord.gg)
-- **GitHub**: [github.com/your-org/aethos](https://github.com)
-- **CSPR.fans**: [Vote for AETHOS](https://cspr.fans)
+- **GitHub**: [github.com/DaMaker1291/SafetyNet](https://github.com)
+- **CSPR.fans**: [Vote for SafetyNet](https://cspr.fans)
 
 ---
 

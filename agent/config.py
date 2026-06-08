@@ -1,4 +1,4 @@
-"""AETHOS Agent Configuration
+"""SafetyNet Agent Configuration
 Environment-based configuration for the AI agent service.
 """
 
@@ -31,7 +31,7 @@ AI_MODEL = os.getenv("AI_MODEL", "gpt-4")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 
 # Agent behaviour
-AGENT_NAME = os.getenv("AGENT_NAME", "Aethos Alpha v1")
+AGENT_NAME = os.getenv("AGENT_NAME", "SafetyNet Alpha v1")
 AGENT_DESCRIPTION = os.getenv("AGENT_DESCRIPTION",
     "Autonomous DeFi strategy agent for Casper ecosystem")
 STRATEGY_INTERVAL_SECONDS = int(os.getenv("STRATEGY_INTERVAL", "3600"))

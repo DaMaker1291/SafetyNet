@@ -1,4 +1,4 @@
-# AETHOS — Roadmap
+# SafetyNet — Roadmap
 
 ## Phase 1: Buildathon (Current)
 *Target: June 2025*
@@ -31,7 +31,7 @@
 - [ ] Reinforcement learning for strategy optimization
 - [ ] Backtesting engine for historical strategy validation
 - [ ] Decentralized agent governance via DAO
-- [ ] Open agent marketplace — deploy your own AETHOS agent
+- [ ] Open agent marketplace — deploy your own SafetyNet agent
 - [ ] Cross-chain interoperability (EVM → Casper bridges)
 - [ ] Mobile dashboard app
 - [ ] Formal verification of AgentVault contract
@@ -39,7 +39,7 @@
 ## Phase 4: Ecosystem
 *Target: 2026*
 
-- [ ] AETHOS SDK for third-party agent development
+- [ ] SafetyNet SDK for third-party agent development
 - [ ] Agent-to-agent communication protocol
 - [ ] Decentralized AI inference network
 - [ ] RWA tokenization pipeline integration
@@ -62,10 +62,10 @@
 
 ## Social Links
 
-- Twitter/X: [@AethosCasper](https://twitter.com) *(set up post-Buildathon)*
-- Discord: [Aethos Community](https://discord.gg) *(set up post-Buildathon)*
-- GitHub: [github.com/your-org/aethos](https://github.com)
-- CSPR.fans: [Vote for AETHOS](https://cspr.fans)
+- Twitter/X: [@SafetyNetCasper](https://twitter.com) *(set up post-Buildathon)*
+- Discord: [SafetyNet Community](https://discord.gg) *(set up post-Buildathon)*
+- GitHub: [github.com/DaMaker1291/SafetyNet](https://github.com)
+- CSPR.fans: [Vote for SafetyNet](https://cspr.fans)
 
 ---
 
