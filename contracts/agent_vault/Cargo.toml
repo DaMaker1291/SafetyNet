@@ -1,0 +1,17 @@
+[package]
+name = "agent-vault"
+version = "1.0.0"
+edition = "2021"
+description = "AgentVault — On-chain registry for autonomous AI agents on Casper"
+
+[dependencies]
+casper-contract = "2.0.0"
+casper-types = "2.0.0"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+
+[profile.release]
+lto = true
+opt-level = "z"
+strip = true

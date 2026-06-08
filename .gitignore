@@ -1,0 +1,40 @@
+# AETHOS — .gitignore
+
+# Environment
+.env
+.keys/
+keys/
+*.pem
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.venv/
+venv/
+
+# Rust / Wasm
+contracts/*/target/
+
+# Node
+node_modules/
+
+# Deploy artifacts
+scripts/.last_deploy_hash
+scripts/.deploy_result.json
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Logs
+*.log
+logs/

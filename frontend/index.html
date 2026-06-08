@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AETHOS — Agent Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0e1a;
+      color: #e0e6f0;
+      min-height: 100vh;
+    }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px 32px; }
+
+    /* Header */
+    header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 16px 0; border-bottom: 1px solid #1e2a45; margin-bottom: 32px;
+    }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon {
+      width: 40px; height: 40px; background: linear-gradient(135deg, #00d4aa, #0088ff);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      font-weight: 800; font-size: 20px; color: #fff;
+    }
+    .logo h1 { font-size: 22px; font-weight: 700; background: linear-gradient(135deg, #00d4aa, #0088ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .logo span { font-size: 13px; color: #7a8ba8; -webkit-text-fill-color: #7a8ba8; }
+    .status-badge {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 16px; border-radius: 20px; font-size: 13px;
+      background: #0d1a2d; border: 1px solid #1e2a45;
+    }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; }
+    .status-dot.active { background: #00d4aa; box-shadow: 0 0 8px #00d4aa66; }
+    .status-dot.inactive { background: #ff4d6a; }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px;
+    }
+    .stat-card {
+      background: #111827; border: 1px solid #1e2a45; border-radius: 12px;
+      padding: 20px; transition: border-color .2s;
+    }
+    .stat-card:hover { border-color: #00d4aa44; }
+    .stat-label { font-size: 13px; color: #7a8ba8; margin-bottom: 8px; }
+    .stat-value { font-size: 28px; font-weight: 700; }
+    .stat-change { font-size: 12px; margin-top: 4px; }
+    .stat-change.up { color: #00d4aa; }
+    .stat-change.down { color: #ff4d6a; }
+
+    /* Two column layout */
+    .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 32px; }
+
+    /* Panel */
+    .panel {
+      background: #111827; border: 1px solid #1e2a45; border-radius: 12px; padding: 24px;
+    }
+    .panel h2 { font-size: 16px; font-weight: 600; margin-bottom: 16px; color: #c8d0dc; }
+    .panel h3 { font-size: 14px; font-weight: 500; margin-bottom: 8px; color: #9aa8c4; }
+
+    /* Chart container */
+    .chart-container { position: relative; height: 240px; }
+
+    /* Strategy list */
+    .strategy-item {
+      padding: 12px 0; border-bottom: 1px solid #1a2540;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .strategy-item:last-child { border-bottom: none; }
+    .strategy-name { font-weight: 500; }
+    .strategy-type { font-size: 12px; color: #7a8ba8; margin-top: 2px; }
+    .strategy-conf {
+      padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: 600;
+    }
+    .conf-high { background: #00d4aa22; color: #00d4aa; }
+    .conf-mid { background: #fbbf2422; color: #fbbf24; }
+    .conf-low { background: #ff4d6a22; color: #ff4d6a; }
+
+    /* Activity table */
+    .activity-table { width: 100%; border-collapse: collapse; }
+    .activity-table th {
+      text-align: left; font-size: 12px; color: #7a8ba8;
+      padding: 8px 12px; border-bottom: 1px solid #1a2540; font-weight: 500;
+    }
+    .activity-table td {
+      padding: 10px 12px; border-bottom: 1px solid #152040; font-size: 13px;
+    }
+    .tx-hash { font-family: monospace; color: #00d4aa; font-size: 12px; }
+    .badge {
+      padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;
+    }
+    .badge.strategy { background: #0088ff22; color: #0088ff; }
+    .badge.action { background: #fbbf2422; color: #fbbf24; }
+    .badge.deploy { background: #00d4aa22; color: #00d4aa; }
+
+    /* Agent Log */
+    .log-entry {
+      padding: 8px 0; border-bottom: 1px solid #152040;
+      font-family: monospace; font-size: 12px; color: #8a9ab8;
+    }
+    .log-entry:last-child { border-bottom: none; }
+    .log-time { color: #586078; }
+    .log-info { color: #00d4aa; }
+    .log-warn { color: #fbbf24; }
+
+    /* Full width panels */
+    .full-panel { margin-bottom: 24px; }
+
+    @media (max-width: 900px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .two-col { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="logo">
+        <div class="logo-icon">A</div>
+        <div>
+          <h1>AETHOS</h1>
+          <span>Autonomous Agent Framework · Casper Network</span>
+        </div>
+      </div>
+      <div class="status-badge">
+        <span class="status-dot active" id="statusDot"></span>
+        <span id="statusText">Agent Running</span>
+        <span style="color:#586078;margin-left:8px;" id="lastUpdate">--</span>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">CSPR Price</div>
+        <div class="stat-value" id="csprPrice">$0.0000</div>
+        <div class="stat-change up" id="csprChange">+0.00%</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Active Strategies</div>
+        <div class="stat-value" id="activeStrategies">0</div>
+        <div class="stat-change" id="strategyChange" style="color:#7a8ba8;">Last 24h</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">On-Chain Actions</div>
+        <div class="stat-value" id="onChainActions">0</div>
+        <div class="stat-change" id="actionChange" style="color:#7a8ba8;">Total recorded</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Agent Confidence</div>
+        <div class="stat-value" id="agentConfidence">0%</div>
+        <div class="stat-change up" id="confidenceChange">--</div>
+      </div>
+    </div>
+
+    <!-- Charts + Strategies -->
+    <div class="two-col">
+      <div class="panel">
+        <h2>Market Overview</h2>
+        <div class="chart-container">
+          <canvas id="marketChart"></canvas>
+        </div>
+      </div>
+      <div class="panel">
+        <h2>Strategy Portfolio</h2>
+        <div id="strategyList">
+          <div class="strategy-item">
+            <div>
+              <div class="strategy-name">Yield Optimizer</div>
+              <div class="strategy-type">DeFi · CSPR/USDC</div>
+            </div>
+            <span class="strategy-conf conf-high">92%</span>
+          </div>
+          <div class="strategy-item">
+            <div>
+              <div class="strategy-name">Liquidity Provision</div>
+              <div class="strategy-type">AMM · CSPR Pool</div>
+            </div>
+            <span class="strategy-conf conf-mid">74%</span>
+          </div>
+          <div class="strategy-item">
+            <div>
+              <div class="strategy-name">Arbitrage Detection</div>
+              <div class="strategy-type">Multi-DEX</div>
+            </div>
+            <span class="strategy-conf conf-low">45%</span>
+          </div>
+          <div class="strategy-item">
+            <div>
+              <div class="strategy-name">Risk Rebalancing</div>
+              <div class="strategy-type">Portfolio Hedge</div>
+            </div>
+            <span class="strategy-conf conf-mid">68%</span>
+          </div>
+          <div class="strategy-item">
+            <div>
+              <div class="strategy-name">RWA Collateralization</div>
+              <div class="strategy-type">Real Estate Token</div>
+            </div>
+            <span class="strategy-conf conf-low">32%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Activity + Agent Log -->
+    <div class="two-col">
+      <div class="panel">
+        <h2>Recent On-Chain Activity</h2>
+        <table class="activity-table">
+          <thead>
+            <tr><th>Type</th><th>Strategy</th><th>TX Hash</th><th>Time</th></tr>
+          </thead>
+          <tbody id="activityBody">
+            <tr><td><span class="badge strategy">STRATEGY</span></td><td>Yield Optimizer</td><td class="tx-hash">0x1a2b...c3d4</td><td>2 min ago</td></tr>
+            <tr><td><span class="badge action">ACTION</span></td><td>Rebalance</td><td class="tx-hash">0x4e5f...g6h7</td><td>15 min ago</td></tr>
+            <tr><td><span class="badge deploy">DEPLOY</span></td><td>Agent Registration</td><td class="tx-hash">0x8i9j...k0l1</td><td>1 hr ago</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="panel">
+        <h2>Agent Decision Log</h2>
+        <div id="agentLog">
+          <div class="log-entry"><span class="log-time">[12:34:22]</span> <span class="log-info">INFO</span> Market snapshot fetched — CSPR $0.0421</div>
+          <div class="log-entry"><span class="log-time">[12:34:23]</span> <span class="log-info">INFO</span> Strategy inference complete — recommending yield_optimizer</div>
+          <div class="log-entry"><span class="log-time">[12:34:25]</span> <span class="log-info">INFO</span> Strategy submitted to AgentVault — tx: 0x1a2b...c3d4</div>
+          <div class="log-entry"><span class="log-time">[12:34:26]</span> <span class="log-info">INFO</span> Action recorded on-chain — tx: 0x4e5f...g6h7</div>
+          <div class="log-entry"><span class="log-time">[11:34:22]</span> <span class="log-warn">WARN</span> Slippage exceeded threshold — adjusting parameters</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <footer style="text-align:center;padding:32px 0 16px;border-top:1px solid #1e2a45;margin-top:16px;">
+      <p style="color:#586078;font-size:13px;">
+        AETHOS · Built for Casper Buildathon 2025 ·
+        <a href="#" style="color:#00d4aa;text-decoration:none;">GitHub</a> ·
+        <a href="#" style="color:#00d4aa;text-decoration:none;">CSPR.fans</a>
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Market chart
+    const ctx = document.getElementById('marketChart').getContext('2d');
+    const labels = Array.from({length: 24}, (_, i) => `${i}h`);
+    const prices = [0.038, 0.039, 0.037, 0.036, 0.038, 0.040, 0.042, 0.041, 0.040, 0.039, 0.041, 0.043, 0.042, 0.044, 0.043, 0.042, 0.041, 0.043, 0.045, 0.044, 0.043, 0.042, 0.041, 0.042];
+    const volumes = [120, 145, 98, 112, 156, 178, 142, 134, 121, 109, 145, 167, 151, 143, 132, 125, 140, 158, 172, 149, 137, 128, 119, 134];
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [
+          {
+            label: 'CSPR Price (USD)',
+            data: prices,
+            borderColor: '#00d4aa',
+            backgroundColor: 'rgba(0,212,170,0.08)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 2,
+            borderWidth: 2,
+            yAxisID: 'y',
+          },
+          {
+            label: 'Volume (k CSPR)',
+            data: volumes,
+            borderColor: '#0088ff',
+            backgroundColor: 'rgba(0,136,255,0.08)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 2,
+            borderWidth: 2,
+            yAxisID: 'y1',
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            labels: { color: '#7a8ba8', font: { size: 11 } }
+          }
+        },
+        scales: {
+          x: { ticks: { color: '#586078', font: { size: 10 } }, grid: { color: '#1a2540' } },
+          y: { ticks: { color: '#586078', font: { size: 10 } }, grid: { color: '#1a2540' }, position: 'left' },
+          y1: { ticks: { color: '#586078', font: { size: 10 } }, grid: { display: false }, position: 'right' }
+        }
+      }
+    });
+
+    // Simulate live updates
+    function updateStats() {
+      const price = (0.038 + Math.random() * 0.012).toFixed(4);
+      document.getElementById('csprPrice').textContent = `$${price}`;
+
+      const strategies = Math.floor(Math.random() * 8) + 3;
+      document.getElementById('activeStrategies').textContent = strategies;
+
+      const actions = Math.floor(Math.random() * 50) + 20;
+      document.getElementById('onChainActions').textContent = actions;
+
+      const conf = (Math.floor(Math.random() * 30) + 65);
+      document.getElementById('agentConfidence').textContent = `${conf}%`;
+
+      const now = new Date();
+      document.getElementById('lastUpdate').textContent =
+        now.toLocaleTimeString();
+    }
+
+    setInterval(updateStats, 5000);
+    updateStats();
+  </script>
+</body>
+</html>
