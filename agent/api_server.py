@@ -16,18 +16,13 @@ Endpoints:
   GET/POST  /api/config        — Strategy weights config
 """
 
-import json
-import os
-import sys
-import time
-import logging
-import threading
+import os, sys, json, time, logging, threading
 from io import StringIO
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
 
-from flask import Flask, jsonify, request
+from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
 
 log = logging.getLogger("safetynet.api")
@@ -324,11 +319,21 @@ def market_data():
     })
 
 
+# ─── Serve Frontend ──────────────────────────────────────────
+
+FRONTEND_DIR = Path(__file__).resolve().parent.parent / "frontend"
+
+
+@app.route("/")
+def serve_dashboard():
+    return send_from_directory(str(FRONTEND_DIR), "index.html")
+
+
 # ─── Main ───────────────────────────────────────────────────
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5100))
-    add_log("INFO", f"SafetyNet v2 API on http://localhost:{port}")
-    print(f"  Dashboard: open frontend/index.html (set port to {port})")
+    add_log("INFO", f"SafetyNet v2 running at http://localhost:{port}")
+    print(f"  Dashboard: http://localhost:{port}")
     print(f"  API:       http://localhost:{port}/api/")
     app.run(host="0.0.0.0", port=port, debug=False, threaded=True)
