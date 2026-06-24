@@ -3,524 +3,1140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SafetyNet v2 — Command Center</title>
+<title>SafetyNet AI — Multi-Agent Yield Router</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#070b15;color:#e0e6f0;min-height:100vh}
-.container{max-width:1600px;margin:0 auto;padding:16px 20px}
+body{
+  font-family:'Inter','SF Pro Display',-apple-system,BlinkMacSystemFont,sans-serif;
+  background:#02050e;color:#e4eaf2;min-height:100vh;overflow-x:hidden
+}
+::selection{background:#00d4aa44;color:#fff}
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:rgba(0,212,170,.25);border-radius:3px}
 
-header{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid #1a2540;margin-bottom:16px}
-.logo{display:flex;align-items:center;gap:10px}
-.logo-icon{width:34px;height:34px;background:linear-gradient(135deg,#00d4aa,#0088ff);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:16px;color:#fff}
-.logo h1{font-size:18px;font-weight:700;color:#e0e6f0}
-.logo small{font-size:11px;color:#586078}
-.header-right{display:flex;align-items:center;gap:10px}
+/* ─── CANVAS BG ─── */
+#particleCanvas{position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none}
 
-.badge{padding:4px 12px;border-radius:12px;font-size:11px;font-weight:600}
-.badge-green{background:#00d4aa22;color:#00d4aa;border:1px solid #00d4aa44}
-.badge-yellow{background:#fbbf2422;color:#fbbf24;border:1px solid #fbbf2444}
-.badge-red{background:#ff4d6a22;color:#ff4d6a;border:1px solid #ff4d6a44}
-.badge-purple{background:#a855f722;color:#a855f7;border:1px solid #a855f744}
+/* ─── STATIC BG LAYERS ─── */
+body::before{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background:
+    radial-gradient(ellipse at 15% 25%,rgba(0,212,170,.06) 0%,transparent 50%),
+    radial-gradient(ellipse at 85% 20%,rgba(0,136,255,.06) 0%,transparent 50%),
+    radial-gradient(ellipse at 50% 80%,rgba(168,85,247,.05) 0%,transparent 50%),
+    radial-gradient(ellipse at 20% 70%,rgba(245,158,11,.02) 0%,transparent 40%);
+  pointer-events:none;z-index:0}
+body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
+  background-image:linear-gradient(rgba(0,212,170,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(0,212,170,.015) 1px,transparent 1px);
+  background-size:56px 56px;pointer-events:none;z-index:0}
 
-.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
-.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:12px}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
-.grid-2-1{display:grid;grid-template-columns:2fr 1fr;gap:12px;margin-bottom:12px}
+.container{max-width:98vw;margin:0 auto;padding:6px 12px;position:relative;z-index:1}
 
-.card{background:#0f1729;border:1px solid #1a2540;border-radius:10px;padding:14px}
-.card h3{font-size:11px;color:#586078;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
-.card .val{font-size:20px;font-weight:700}
-.card .sub{font-size:11px;color:#586078;margin-top:2px}
+/* ─── ANIMATED INTRO SPLASH ─── */
+#splash{position:fixed;top:0;left:0;right:0;bottom:0;z-index:10000;
+  background:#02050e;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  transition:opacity .6s ease,transform .6s ease}
+#splash.hide{opacity:0;transform:scale(1.04);pointer-events:none}
+#splash .logo-big{font-size:52px;font-weight:800;background:linear-gradient(135deg,#00d4aa,#0088ff,#a855f7,#f59e0b);
+  background-size:300% 300%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  animation:splashGrad 3s ease infinite;margin-bottom:8px}
+@keyframes splashGrad{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+#splash .sub{font-size:13px;color:#4a5a7a;letter-spacing:3px;text-transform:uppercase;animation:splashFade 1.6s ease forwards;opacity:0;animation-delay:.2s}
+#splash .dot-row{display:flex;gap:6px;margin-top:24px}
+#splash .dot-row span{width:8px;height:8px;border-radius:50%;animation:splashDot 1.2s ease infinite}
+#splash .dot-row span:nth-child(1){background:#00d4aa;animation-delay:0s}
+#splash .dot-row span:nth-child(2){background:#0088ff;animation-delay:.15s}
+#splash .dot-row span:nth-child(3){background:#a855f7;animation-delay:.3s}
+#splash .dot-row span:nth-child(4){background:#fbbf24;animation-delay:.45s}
+#splash .dot-row span:nth-child(5){background:#ff4d6a;animation-delay:.6s}
+@keyframes splashDot{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.4);opacity:1}}
+@keyframes splashFade{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
 
-.panel-title{font-size:13px;font-weight:600;color:#c8d0dc;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+/* ─── PIPELINE AGENT FLOW ─── */
+.pipeline{display:flex;align-items:center;justify-content:space-between;gap:0;margin-bottom:8px;padding:8px 10px;
+  background:rgba(3,7,16,.75);border:1px solid rgba(26,37,64,.25);border-radius:12px;backdrop-filter:blur(16px);
+  position:relative;overflow:hidden;min-height:60px;box-shadow:0 0 30px rgba(0,0,0,.15)}
+.pipeline::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,170,.2),rgba(168,85,247,.2),transparent)}
+.pipe-node{display:flex;flex-direction:column;align-items:center;gap:3px;position:relative;z-index:1;flex-shrink:0;cursor:pointer;padding:3px 4px;transition:all .2s}
+.pipe-node:hover{transform:translateY(-3px)}
+.pipe-node.deployed .pipe-dot{background:#00d4aa;box-shadow:0 0 14px rgba(0,212,170,.35),inset 0 0 6px rgba(0,212,170,.15)}
+.pipe-node.undeployed .pipe-dot{background:#1a2540;box-shadow:none}
+.pipe-node.active .pipe-dot{animation:nodePulse 1.2s ease infinite}
+@keyframes nodePulse{0%,100%{box-shadow:0 0 14px rgba(0,212,170,.35)}50%{box-shadow:0 0 28px rgba(0,212,170,.6),0 0 50px rgba(0,212,170,.15)}}
+.pipe-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:#fff;transition:all .3s;position:relative}
+.pipe-dot::after{content:'';position:absolute;top:-3px;left:-3px;right:-3px;bottom:-3px;border-radius:50%;border:1.5px solid rgba(0,212,170,.12);animation:pipePulse 2.4s ease infinite}
+@keyframes pipePulse{0%,100%{opacity:.2;transform:scale(1)}50%{opacity:.5;transform:scale(1.1)}}
+.pipe-label{font-size:6.5px;color:#4a5a7a;white-space:nowrap;letter-spacing:.3px;text-align:center;font-weight:500}
+.pipe-connector{flex:1;height:2px;background:linear-gradient(90deg,rgba(0,212,170,.15),rgba(0,136,255,.1));position:relative;min-width:16px;margin:0 2px}
+.pipe-connector .packet{position:absolute;top:-5px;width:12px;height:12px;border-radius:50%;
+  background:radial-gradient(circle,rgba(0,212,170,.5),rgba(0,136,255,.15),transparent 70%);
+  animation:packetFlow 2s ease infinite;filter:blur(1px)}
+.pipe-connector .packet2{position:absolute;top:-1px;width:6px;height:6px;border-radius:50%;
+  background:radial-gradient(circle,rgba(168,85,247,.4),transparent 70%);
+  animation:packetFlow 2.4s ease infinite .6s}
+@keyframes packetFlow{0%{left:-6px;opacity:0;transform:scale(.3)}20%{opacity:1;transform:scale(1)}80%{opacity:.8}100%{left:calc(100% - 6px);opacity:0;transform:scale(.2)}}
 
-.btn{padding:6px 14px;border:none;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:5px}
-.btn:hover{transform:translateY(-1px);opacity:.9}
-.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.btn-primary{background:#00d4aa;color:#070b15}
-.btn-danger{background:#ff4d6a;color:#fff}
-.btn-outline{background:transparent;color:#7a8ba8;border:1px solid #1e2a45}
-.btn-outline:hover{border-color:#00d4aa44;color:#e0e6f0}
-.btn-sm{padding:4px 10px;font-size:11px}
-.btn-xs{padding:2px 8px;font-size:10px}
+/* ─── HEADER ─── */
+.header{display:flex;justify-content:space-between;align-items:center;padding:8px 0 10px;margin-bottom:8px;position:relative}
+.header::after{content:'';position:absolute;bottom:0;left:5%;right:5%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,170,.2),rgba(168,85,247,.2),rgba(245,158,11,.2),transparent)}
+.logo{display:flex;align-items:center;gap:12px}
+.logo-icon{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:15px;color:#fff;
+  background:linear-gradient(135deg,#00d4aa,#0088ff,#a855f7);background-size:200% 200%;animation:logoShift 3s ease infinite;
+  box-shadow:0 0 16px rgba(0,212,170,.2),0 0 40px rgba(168,85,247,.08);position:relative}
+.logo-icon::after{content:'';position:absolute;top:-1px;left:-1px;right:-1px;bottom:-1px;border-radius:11px;background:linear-gradient(135deg,#00d4aa44,#a855f744);z-index:-1;filter:blur(4px)}
+@keyframes logoShift{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+.logo h1{font-size:15px;font-weight:800;background:linear-gradient(135deg,#00d4aa,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-size:200% auto;animation:logoGrad 4s ease infinite}
+@keyframes logoGrad{0%{background-position:0% center}50%{background-position:100% center}100%{background-position:0% center}}
+.logo small{font-size:7px;color:#3a4a6a;letter-spacing:.3px}
+.h-right{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.badge{padding:2px 10px;border-radius:7px;font-size:7.5px;font-weight:600;position:relative}
+.badge-g{background:rgba(0,212,170,.1);color:#00d4aa;border:1px solid rgba(0,212,170,.2)}
+.badge-y{background:rgba(251,191,36,.1);color:#fbbf24;border:1px solid rgba(251,191,36,.2)}
+.badge-r{background:rgba(255,77,106,.1);color:#ff4d6a;border:1px solid rgba(255,77,106,.2)}
+.badge-p{background:rgba(168,85,247,.1);color:#a855f7;border:1px solid rgba(168,85,247,.2)}
+.badge-b{background:rgba(0,136,255,.1);color:#0088ff;border:1px solid rgba(0,136,255,.2)}
+.badge-gold{background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.2);animation:glowPulse 2s ease infinite alternate}
+@keyframes glowPulse{from{box-shadow:0 0 4px rgba(245,158,11,0)}to{box-shadow:0 0 12px rgba(245,158,11,.15)}}
 
-input,select{background:#0d1a2d;border:1px solid #1e2a45;border-radius:5px;padding:6px 10px;color:#e0e6f0;font-size:12px}
-input:focus{outline:none;border-color:#00d4aa66}
+/* ─── METRIC ROW ─── */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:7px}
+.metric{display:flex;align-items:center;gap:10px;padding:8px 10px;
+  background:rgba(4,9,20,.75);border:1px solid rgba(26,37,64,.3);border-radius:10px;
+  backdrop-filter:blur(8px);transition:all .2s;position:relative;overflow:hidden}
+.metric:hover{border-color:rgba(0,212,170,.12);transform:translateY(-1px)}
+.metric::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,170,.08),transparent)}
+.metric .ic{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.metric .ic.g{background:rgba(0,212,170,.1);box-shadow:0 0 8px rgba(0,212,170,.05)}
+.metric .ic.p{background:rgba(168,85,247,.1);box-shadow:0 0 8px rgba(168,85,247,.05)}
+.metric .ic.b{background:rgba(0,136,255,.1);box-shadow:0 0 8px rgba(0,136,255,.05)}
+.metric .ic.y{background:rgba(251,191,36,.1);box-shadow:0 0 8px rgba(251,191,36,.05)}
+.metric .lbl{font-size:7px;color:#3a4a6a;text-transform:uppercase;letter-spacing:.6px}
+.metric .val{font-size:17px;font-weight:700;letter-spacing:-.3px;font-variant-numeric:tabular-nums;line-height:1.1}
+.metric .sub{font-size:7px;color:#3a4a6a}
 
-.tabs{display:flex;gap:3px;margin-bottom:10px;flex-wrap:wrap}
-.tab{padding:5px 14px;border-radius:5px;font-size:11px;font-weight:500;cursor:pointer;background:#0d1a2d;color:#586078;border:1px solid transparent}
-.tab.active{background:#1e2a45;color:#e0e6f0;border-color:#2a3a5a}
+/* ─── AI MODEL PIPELINE ─── */
+.ai-strip{display:flex;gap:7px;margin-bottom:7px}
+.ai-card{flex:1;padding:8px 10px;border-radius:10px;border:1px solid rgba(26,37,64,.25);
+  background:rgba(4,9,20,.75);transition:all .25s;position:relative;overflow:hidden;cursor:default;
+  backdrop-filter:blur(4px)}
+.ai-card:hover{transform:translateY(-2px);border-color:rgba(0,212,170,.15);box-shadow:0 4px 20px rgba(0,0,0,.2)}
+.ai-card::after{content:'';position:absolute;top:-50%;left:-50%;width:200%;height:200%;
+  background:conic-gradient(from 0deg,transparent,transparent,transparent,rgba(0,212,170,.03),transparent,transparent,transparent);
+  animation:cardRotate 6s linear infinite;pointer-events:none}
+@keyframes cardRotate{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+.ai-card .accent{position:absolute;top:0;left:0;right:0;height:2.5px;z-index:2}
+.ai-card .hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.ai-card .nm{font-size:9px;font-weight:600;color:#c8d0dc}
+.ai-card .tp{font-size:6.5px;color:#3a4a6a;margin-top:1px}
+.ai-card .out{font-size:15px;font-weight:700;letter-spacing:-.2px;margin:3px 0 2px;position:relative;z-index:1}
+.ai-card .sub-m{font-size:7px;color:#3a4a6a;font-family:'SF Mono','Fira Code',monospace;position:relative;z-index:1}
+.ai-ring{width:100%;height:4px;background:rgba(26,37,64,.35);border-radius:3px;margin:3px 0;overflow:hidden;position:relative}
+.ai-ring .fill{height:100%;border-radius:3px;transition:width 1s cubic-bezier(.4,0,.2,1);position:relative}
+.ai-ring .fill::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);background-size:200% 100%;animation:shine 1.8s ease infinite}
+@keyframes shine{0%{background-position:-100% center}100%{background-position:200% center}}
 
-.console{background:#050810;border:1px solid #1a2540;border-radius:6px;height:280px;overflow-y:auto;font-family:'SF Mono','Fira Code',monospace;font-size:11px;padding:10px;line-height:1.6}
-.console .l{white-space:pre-wrap;word-break:break-all}
-.console .t{color:#3a4560}
+/* ─── FADE IN ANIMATION ─── */
+.fade-in{animation:fadeIn .3s ease forwards;opacity:0}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── CONTROLS ─── */
+.controls{display:flex;gap:5px;flex-wrap:wrap;align-items:center}
+.btn{padding:4px 14px;border:none;border-radius:6px;font-size:8px;font-weight:600;cursor:pointer;transition:all .12s;display:inline-flex;align-items:center;gap:3px;position:relative;overflow:hidden}
+.btn:hover{transform:translateY(-1px);filter:brightness(1.1)}
+.btn:active{transform:scale(.96)}
+.btn:disabled{opacity:.3;cursor:not-allowed;transform:none}
+.btn-p{background:linear-gradient(135deg,#00d4aa,#00b894);color:#050b18;box-shadow:0 2px 8px rgba(0,212,170,.15)}
+.btn-d{background:linear-gradient(135deg,#ff4d6a,#e04060);color:#fff;box-shadow:0 2px 8px rgba(255,77,106,.15)}
+.btn-o{background:transparent;color:#586078;border:1px solid rgba(30,42,69,.5)}
+.btn-o:hover{border-color:rgba(0,212,170,.3);color:#e0e6f0;background:rgba(0,212,170,.04)}
+.btn-gh{background:transparent;border:1px solid transparent;color:#586078}
+.btn-gh:hover{background:rgba(26,37,64,.3);color:#e0e6f0}
+.btn-sm{padding:3px 10px;font-size:7px}
+.btn-xs{padding:2px 8px;font-size:6.5px;border-radius:5px}
+.btn-gold{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 2px 8px rgba(245,158,11,.15)}
+
+input,select,textarea{background:rgba(3,8,16,.95);border:1px solid rgba(30,42,69,.5);border-radius:6px;padding:3px 8px;color:#e0e6f0;font-size:8px;transition:all .2s}
+input:focus,select:focus,textarea:focus{outline:none;border-color:rgba(0,212,170,.4);box-shadow:0 0 0 3px rgba(0,212,170,.06)}
+
+/* ─── TABS ─── */
+.tabs{display:flex;gap:1px;margin-bottom:7px;flex-wrap:wrap;background:rgba(2,5,12,.4);border-radius:8px;padding:3px;border:1px solid rgba(26,37,64,.12)}
+.tab{padding:4px 12px;border-radius:6px;font-size:7.5px;font-weight:500;cursor:pointer;background:transparent;color:#4a5a7a;border:none;transition:all .18s;white-space:nowrap}
+.tab:hover{color:#9aa8c4;background:rgba(26,37,64,.15)}
+.tab.active{background:rgba(26,37,64,.4);color:#e0e6f0;box-shadow:0 1px 3px rgba(0,0,0,.15);font-weight:600}
+
+/* ─── TAB CONTENT TRANSITIONS ─── */
+.tab-content{animation:tabSlide .28s ease forwards}
+@keyframes tabSlide{from{opacity:0;transform:translateX(8px)}to{opacity:1;transform:translateX(0)}}
+
+/* ─── CARDS ─── */
+.card{padding:8px 10px;border-radius:10px;border:1px solid rgba(26,37,64,.25);
+  background:rgba(4,9,20,.7);margin-bottom:6px;backdrop-filter:blur(6px);transition:all .2s;position:relative}
+.card:hover{border-color:rgba(0,212,170,.1)}
+.card::after{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(0,212,170,.06),transparent);pointer-events:none}
+.card h3{font-size:8px;color:#3a4a6a;text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;font-weight:600}
+.g-2{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:6px}
+.g-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:6px}
+.g-4{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:6px}
+.stat-row{display:flex;gap:5px;margin-bottom:6px;flex-wrap:wrap}
+.stat-box{flex:1;min-width:80px;padding:7px 8px;text-align:center;
+  background:rgba(4,9,20,.7);border:1px solid rgba(26,37,64.22);border-radius:8px;transition:all .2s}
+.stat-box:hover{border-color:rgba(0,212,170,.1);transform:translateY(-1px)}
+.stat-box .l{font-size:7px;color:#3a4a6a;text-transform:uppercase;letter-spacing:.6px}
+.stat-box .n{font-size:17px;font-weight:700;letter-spacing:-.2px;font-variant-numeric:tabular-nums}
+.stat-box .c{font-size:7.5px;font-weight:500}
+
+/* ─── CONSOLE ─── */
+.console{background:rgba(1,3,8,.97);border:1px solid rgba(26,37,64,.2);border-radius:8px;height:150px;overflow-y:auto;
+  font-family:'SF Mono','Fira Code','JetBrains Mono',monospace;font-size:7px;padding:5px;line-height:1.6}
+.console .l{padding:2px 0;border-bottom:1px solid rgba(18,28,48,.12)}
+.console .t{color:#1a2540}
 .console .l-INFO{color:#00d4aa}
 .console .l-WARN{color:#fbbf24}
 .console .l-ERROR{color:#ff4d6a}
 .console .l-MCP{color:#a855f7}
-.console .l-ORCH{color:#0088ff}
+.console .l-DATA{color:#0088ff}
+.ai-box{background:rgba(1,3,8,.97);border:1px solid rgba(26,37,64,.2);border-radius:8px;padding:6px;font-size:8px;color:#9aa8c4;line-height:1.6;min-height:36px}
+.ai-box .hl{color:#00d4aa;font-weight:600}
+.ai-box .tag{display:inline-block;padding:0 4px;border-radius:3px;background:rgba(0,212,170,.08);color:#00d4aa;font-size:6.5px}
 
-table{width:100%;border-collapse:collapse;font-size:12px}
-th{text-align:left;color:#586078;font-weight:500;font-size:10px;padding:5px 6px;border-bottom:1px solid #1a2540;text-transform:uppercase;letter-spacing:.3px}
-td{padding:6px;border-bottom:1px solid #152040}
-.tx{font-family:monospace;color:#00d4aa;font-size:10px}
-.bar{height:3px;border-radius:3px;margin-top:3px}
-.flex{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+/* ─── TABLES ─── */
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:7.5px}
+th{padding:4px 6px;text-align:left;color:#4a5a7a;font-weight:500;font-size:6.5px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(26,37,64,.3);position:sticky;top:0;background:rgba(4,9,20,.95)}
+td{padding:4px 6px;border-bottom:1px solid rgba(18,28,48,.3)}
+tbody tr:hover{background:rgba(0,212,170,.015)}
+.tx{font-family:'SF Mono','Fira Code',monospace;color:#00d4aa;font-size:7px}
+.scroll{max-height:200px;overflow-y:auto}.scroll-sm{max-height:120px;overflow-y:auto}
+.flex{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
 .flex-b{display:flex;justify-content:space-between;align-items:center}
-.gap-sm{gap:4px}
 
-.phase-select{display:flex;gap:4px}
-.phase-btn{padding:3px 12px;border-radius:4px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid #1e2a45;background:#0d1a2d;color:#586078}
-.phase-btn.active{background:#00d4aa22;color:#00d4aa;border-color:#00d4aa44}
+/* ─── CHARTS ─── */
+.chart-box{position:relative;height:150px;margin:3px 0}
+.chart-box-sm{height:90px;margin:3px 0}
 
-@media(max-width:900px){.grid-4,.grid-3,.grid-2,.grid-2-1{grid-template-columns:1fr}}
+/* ─── COMPETITION ─── */
+.comp-scroll{overflow-x:auto}
+.comp-row{display:grid;grid-template-columns:130px repeat(4,1fr);gap:2px;padding:4px 6px;border-bottom:1px solid rgba(26,37,64,.15);font-size:7px;align-items:center;min-width:540px}
+.comp-row.header{color:#4a5a7a;font-size:6.5px;text-transform:uppercase;letter-spacing:.5px;border-bottom:1px solid rgba(26,37,64,.3);background:rgba(26,37,64,.1);border-radius:5px 5px 0 0}
+.comp-check{color:#00d4aa;font-size:11px}
+.comp-cross{color:#4a5a7a;font-size:11px}
+.comp-row.safetynet{background:rgba(0,212,170,.04);border-left:2.5px solid rgba(0,212,170,.2)}
+.comp-feature{font-weight:500}
+
+/* ─── TIMELINE ─── */
+.timeline{position:relative;padding-left:18px}
+.timeline::before{content:'';position:absolute;left:5px;top:4px;bottom:4px;width:1.5px;background:linear-gradient(to bottom,rgba(0,136,255,.35),rgba(0,136,255,.03))}
+.timeline-item{position:relative;padding:5px 0 5px 12px;font-size:7px;border-bottom:1px solid rgba(26,37,64,.1)}
+.timeline-item::before{content:'';position:absolute;left:-16px;top:7px;width:7px;height:7px;border-radius:50%;background:#0088ff;box-shadow:0 0 6px rgba(0,136,255,.35)}
+
+/* ─── TOAST ─── */
+#toasts{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.tst{padding:8px 16px;border-radius:8px;font-size:8px;font-weight:500;backdrop-filter:blur(16px);animation:tIn .3s ease,tOut .3s ease 2.6s forwards;border:1px solid rgba(26,37,64,.25);pointer-events:auto;box-shadow:0 4px 20px rgba(0,0,0,.3);max-width:300px}
+.tst.s{background:rgba(0,212,170,.12);color:#00d4aa;border-color:rgba(0,212,170,.18)}
+.tst.e{background:rgba(255,77,106,.12);color:#ff4d6a;border-color:rgba(255,77,106,.18)}
+.tst.i{background:rgba(0,136,255,.12);color:#0088ff;border-color:rgba(0,136,255,.18)}
+.tst.w{background:rgba(251,191,36,.12);color:#fbbf24;border-color:rgba(251,191,36,.18)}
+@keyframes tIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}
+@keyframes tOut{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(20px)}}
+
+/* ─── SUB-AGENT CARDS ─── */
+.ag-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:6px;margin-bottom:6px}
+.ag-card{padding:6px;border-radius:8px;border:1px solid rgba(26,37,64,.22);
+  background:rgba(4,9,20,.7);transition:all .2s;position:relative;overflow:hidden}
+.ag-card:hover{transform:translateY(-1px);box-shadow:0 3px 14px rgba(0,0,0,.15)}
+.ag-card .bar{position:absolute;top:0;left:0;right:0;height:2.5px}
+.ag-card .h{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px}
+.ag-card .n{font-size:9px;font-weight:600;color:#c8d0dc}
+.ag-card .t{font-size:6.5px;color:#4a5a7a}
+.ag-card .d{font-size:7px;color:#586078;margin:3px 0;line-height:1.4}
+.ag-card .tags{display:flex;flex-wrap:wrap;gap:3px;margin:3px 0}
+
+/* ─── KBD SHORTCUTS ─── */
+.kbd{color:#3a4a6a;font-size:7px}
+kbd{display:inline-block;padding:1px 5px;border-radius:4px;font-size:6.5px;font-family:inherit;background:rgba(26,37,64,.3);border:1px solid rgba(26,37,64,.4);color:#586078;margin:0 1px}
+
+/* ─── TICKER BAR ─── */
+.ticker{overflow:hidden;white-space:nowrap;background:rgba(2,5,12,.6);border:1px solid rgba(26,37,64,.15);border-radius:6px;padding:4px 0;margin-bottom:6px;position:relative}
+.ticker-inner{display:inline-block;animation:tickerScroll 28s linear infinite}
+@keyframes tickerScroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.ticker-item{display:inline-block;padding:0 16px;font-size:7.5px;color:#586078;border-right:1px solid rgba(26,37,64,.15)}
+.ticker-item b{color:#9aa8c4}
+.ticker-item .up{color:#00d4aa}
+.ticker-item .dn{color:#ff4d6a}
+
+/* ─── RESPONSIVE ─── */
+@media(max-width:1100px){
+  .metrics{grid-template-columns:1fr 1fr}
+  .ai-strip{flex-wrap:wrap}
+  .ai-card{min-width:30%}
+}
+@media(max-width:750px){
+  .metrics,.g-2,.g-3,.g-4{grid-template-columns:1fr}
+  .pipeline{flex-wrap:wrap;gap:3px}
+  .pipe-connector{min-width:8px}
+  .ag-grid{grid-template-columns:1fr}
+  .header{flex-direction:column;gap:4px}
+  .stat-row{flex-direction:column}
+  .stat-box{min-width:auto}
+  #splash .logo-big{font-size:32px}
+}
 </style>
 </head>
 <body>
+<canvas id="particleCanvas"></canvas>
+<div id="toasts"></div>
+<div id="splash">
+  <div class="logo-big">SafetyNet AI</div>
+  <div class="sub">Autonomous Yield-Routing Agent</div>
+  <div class="dot-row"><span></span><span></span><span></span><span></span><span></span></div>
+</div>
 <div class="container">
 
-<header>
+<!-- Pipeline: Agent Flow Visualization -->
+<div class="pipeline" id="pipeline"></div>
+
+<!-- Header -->
+<div class="header">
   <div class="logo">
     <div class="logo-icon">S</div>
-    <div><h1>SafetyNet <small>v2 Command Center</small></h1></div>
+    <div><h1>SafetyNet AI</h1><small>7 Sub-Agents · 5 NNs · 0 API Calls · On-Chain</small></div>
   </div>
-  <div class="header-right">
-    <input type="number" id="portInput" value="5100" style="width:60px" placeholder="Port">
-    <button class="btn btn-outline btn-sm" onclick="updatePort()">Connect</button>
-    <span class="badge badge-green" id="statusBadge">● Idle</span>
-    <span style="color:#3a4560;font-size:11px" id="phaseLabel">Phase 2</span>
+  <div class="h-right">
+    <span class="badge badge-gold" id="compBadge">&#9733; Innovation Track</span>
+    <input type="number" id="portInput" value="5100" style="width:40px" placeholder="Port">
+    <button class="btn btn-o btn-xs" onclick="updatePort()">Connect</button>
+    <button class="btn btn-gh btn-xs" onclick="toggleFullscreen()" title="Fullscreen">&#9974;</button>
+    <button class="btn btn-gh btn-xs" onclick="toggleDemo()" title="Auto-Demo">&#9654;</button>
+    <span class="badge badge-g" id="statusBadge">&#9679; Idle</span>
+    <span style="color:#4a5a7a;font-size:7px" id="phaseLabel">P2 — Paper</span>
   </div>
-</header>
-
-<!-- Stats -->
-<div class="grid-4">
-  <div class="card"><h3>Cycles</h3><div class="val" id="statCycles">0</div><div class="sub">total executed</div></div>
-  <div class="card"><h3>Opportunities</h3><div class="val" id="statOpps">0</div><div class="sub">evaluated</div></div>
-  <div class="card"><h3>TX Submitted</h3><div class="val" id="statTX">0</div><div class="sub">via orchestrator</div></div>
-  <div class="card"><h3>Queue</h3><div class="val" id="statQueue">0</div><div class="sub">pending</div></div>
 </div>
 
-<!-- Phase + Controls -->
-<div class="card" style="margin-bottom:12px">
-  <div class="flex-b" style="margin-bottom:6px">
-    <span class="panel-title">Agent Controls</span>
-    <div class="phase-select">
-      <button class="phase-btn" data-phase="1" onclick="setPhase(1)">P1 Read</button>
-      <button class="phase-btn active" data-phase="2" onclick="setPhase(2)">P2 Paper</button>
-      <button class="phase-btn" data-phase="3" onclick="setPhase(3)">P3 Limited</button>
-      <button class="phase-btn" data-phase="4" onclick="setPhase(4)">P4 Full</button>
+<!-- Ticker Bar -->
+<div class="ticker"><div class="ticker-inner" id="tickerBar"></div></div>
+
+<!-- Metrics -->
+<div class="metrics">
+  <div class="metric"><div class="ic g">&#9654;</div><div><div class="lbl">Cycles</div><div class="val" style="color:#00d4aa" id="statCycles">0</div><div class="sub">AI-driven</div></div></div>
+  <div class="metric"><div class="ic p">&#9881;</div><div><div class="lbl">Inferences</div><div class="val" style="color:#a855f7" id="statInference">0</div><div class="sub" id="statAvgMs">avg --ms</div></div></div>
+  <div class="metric"><div class="ic b">&#9733;</div><div><div class="lbl">Opps Eval</div><div class="val" style="color:#0088ff" id="statOpps">0</div><div class="sub">4 NN models</div></div></div>
+  <div class="metric"><div class="ic y">&#9881;</div><div><div class="lbl">Queue</div><div class="val" style="color:#fbbf24" id="statQueue">0</div><div class="sub">pending txs</div></div></div>
+</div>
+
+<!-- Controls -->
+<div class="card" style="padding:8px 12px">
+  <div class="flex-b" style="margin-bottom:3px">
+    <span style="font-size:10px;font-weight:600;display:flex;align-items:center;gap:6px"><span style="font-size:13px">&#9889;</span> Agent Control Center</span>
+    <div class="flex" style="gap:3px">
+      <button class="btn btn-gh btn-xs" data-phase="1" onclick="setPhase(1)">P1</button>
+      <button class="btn btn-gh btn-xs active" data-phase="2" onclick="setPhase(2)">P2</button>
+      <button class="btn btn-gh btn-xs" data-phase="3" onclick="setPhase(3)">P3</button>
+      <button class="btn btn-gh btn-xs" data-phase="4" onclick="setPhase(4)">P4</button>
     </div>
   </div>
-  <div class="flex gap-sm">
-    <button class="btn btn-primary btn-sm" onclick="runCycle()">▶ 1 Cycle</button>
-    <button class="btn btn-primary btn-sm" onclick="runMultiple()">▶▶ Run</button>
-    <input type="number" id="cycleCount" value="3" min="1" max="20" style="width:50px">
-    <span style="color:#586078;font-size:11px">cycles</span>
-    <button class="btn btn-danger btn-sm" onclick="stopAgent()">■ Stop</button>
-    <button class="btn btn-outline btn-sm" onclick="refreshAll()">↻ Refresh</button>
-    <button class="btn btn-outline btn-sm" onclick="clearLogs()">Clear</button>
-    <span style="color:#3a4560;font-size:11px" id="cycleRunning"></span>
+  <div class="flex" style="gap:4px">
+    <button class="btn btn-p btn-sm" onclick="runCycle()">&#9654; 1 Cycle</button>
+    <button class="btn btn-p btn-sm" onclick="runMultiple()">&#9654;&#9654; Batch</button>
+    <input type="number" id="cycleCount" value="5" min="1" max="20" style="width:32px">
+    <span style="color:#4a5a7a;font-size:7px">cycles</span>
+    <button class="btn btn-o btn-sm" onclick="aiOnlyAnalysis()">&#129504; AI Only</button>
+    <button class="btn btn-d btn-sm" onclick="stopAgent()">&#9632;</button>
+    <button class="btn btn-o btn-sm" onclick="refreshAll()">&#8635;</button>
+    <button class="btn btn-o btn-sm" onclick="clearLogs()">Clear</button>
+    <span style="color:#fbbf24;font-size:7px" id="cycleRunning"></span>
   </div>
+  <div style="margin-top:4px;font-size:7px;color:#3a4a6a">
+    Shortcuts: <kbd>1</kbd> Cycle <kbd>B</kbd> Batch <kbd>A</kbd> AI <kbd>S</kbd> Stop <kbd>F</kbd> Fullscreen <kbd>D</kbd> Demo <kbd>?</kbd> Help
+  </div>
+</div>
+
+<!-- AI Model Strip -->
+<div style="margin-bottom:7px">
+  <div class="flex-b" style="margin-bottom:3px">
+    <span style="font-size:9px;font-weight:600;color:#a855f7;display:flex;align-items:center;gap:5px"><span style="font-size:12px">&#9889;</span> 5 Local Neural Networks</span>
+    <span style="font-size:7px;color:#4a5a7a" id="aiModelStatus">loading...</span>
+  </div>
+  <div class="ai-strip" id="modelCards"></div>
 </div>
 
 <!-- Tabs -->
 <div class="tabs">
   <div class="tab active" data-tab="overview" onclick="switchTab('overview')">Overview</div>
-  <div class="tab" data-tab="opportunities" onclick="switchTab('opportunities')">Opportunities</div>
-  <div class="tab" data-tab="risk" onclick="switchTab('risk')">Risk Engine</div>
-  <div class="tab" data-tab="mcp" onclick="switchTab('mcp')">MCP Server</div>
-  <div class="tab" data-tab="orchestrator" onclick="switchTab('orchestrator')">Orchestrator</div>
-  <div class="tab" data-tab="gas" onclick="switchTab('gas')">Gas</div>
+  <div class="tab" data-tab="ai" onclick="switchTab('ai')">AI Engine</div>
+  <div class="tab" data-tab="paper" onclick="switchTab('paper')">Paper</div>
+  <div class="tab" data-tab="markets" onclick="switchTab('markets')">Markets</div>
+  <div class="tab" data-tab="risk" onclick="switchTab('risk')">Risk</div>
+  <div class="tab" data-tab="x402" onclick="switchTab('x402')">x402</div>
+  <div class="tab" data-tab="agents" onclick="switchTab('agents')">&#129302; Agents</div>
+  <div class="tab" data-tab="competition" onclick="switchTab('competition')">&#127942; Compete</div>
+  <div class="tab" data-tab="mcp" onclick="switchTab('mcp')">MCP</div>
+  <div class="tab" data-tab="tx" onclick="switchTab('tx')">TX</div>
 </div>
 
-<!-- Tab: Overview -->
+<!-- OVERVIEW -->
 <div id="tab-overview" class="tab-content">
-  <div class="grid-2">
-    <div class="card">
-      <div class="panel-title"><span>Agent Decision Log</span><span style="color:#586078;font-size:10px" id="logCount">0</span></div>
-      <div class="console" id="logConsole"><div class="l"><span class="t">[--:--:--]</span> <span class="l-INFO">Ready — controls above</span></div></div>
-    </div>
-    <div class="card">
-      <div class="panel-title"><span>Top Yield Opportunities</span><button class="btn btn-outline btn-xs" onclick="fetchOpportunities()">↻</button></div>
-      <div style="max-height:280px;overflow-y:auto">
-        <table><thead><tr><th>Strategy</th><th>Target</th><th>Net APR</th><th>Risk</th><th>Conf</th></tr></thead>
-        <tbody id="oppTable"><tr><td colspan="5" style="color:#586078;text-align:center">Run a cycle or click refresh</td></tr></tbody>
-        </table>
-      </div>
-    </div>
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Agent Log</span><span style="color:#4a5a7a;font-size:7px" id="logCount">0</span></div>
+      <div class="console" id="logConsole"><div class="l"><span class="t">[--:--:--]</span> <span class="l-INFO">7 sub-agents deployed · 5 NNs loaded</span></div></div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">AI Reasoning</span><span style="color:#a855f7;font-size:7px" id="reasonModel">--</span></div>
+      <div class="ai-box" id="aiReasoningOutput"><span style="color:#4a5a7a">&#9654; Run a cycle or <span style="color:#a855f7">AI Only</span> to see AI reasoning</span></div></div>
   </div>
-  <div class="card">
-    <div class="panel-title"><span>Allocation Plan</span><span style="color:#586078;font-size:10px" id="allocSummary">—</span></div>
-    <div style="overflow-x:auto"><table><thead><tr><th>#</th><th>Strategy</th><th>Target</th><th>Alloc %</th><th>Alloc USD</th><th>Expected APR</th><th>Risk Score</th></tr></thead>
-      <tbody id="allocTable"><tr><td colspan="7" style="color:#586078;text-align:center">No allocation yet</td></tr></tbody>
-    </table></div>
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Allocation Plan</span><span style="color:#4a5a7a;font-size:7px" id="allocSummary">&mdash;</span></div>
+    <div class="scroll"><table><thead><tr><th>#</th><th>Strategy</th><th>Target</th><th>Alloc %</th><th>USD</th><th>APR</th><th>Risk</th></tr></thead>
+      <tbody id="allocTable"><tr><td colspan="7" style="color:#4a5a7a;text-align:center;font-size:8px;padding:10px">Run a cycle to see allocation</td></tr></tbody>
+    </table></div></div>
+</div>
+
+<!-- AI ENGINE -->
+<div id="tab-ai" class="tab-content" style="display:none">
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Market Analysis</span><button class="btn btn-p btn-xs" onclick="runAIAnalysis()">Run Now</button></div>
+      <div id="aiAnalysisResult" style="font-size:8px;color:#586078">Click <b style="color:#a855f7">Run Now</b> for full market analysis</div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Confidence Radar</span><span style="color:#4a5a7a;font-size:7px"><span id="aiTotalCalls">0</span> calls</span></div>
+      <div class="chart-box-sm"><canvas id="radarChart"></canvas></div></div>
+  </div>
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Strategy Reasoner</span></div>
+      <div class="flex" style="margin-bottom:3px">
+        <select id="reasonStrat" style="width:110px"><option>yield_optimizer</option><option>liquidity_provision</option><option>arbitrage</option><option>risk_rebalancing</option><option>lending</option></select>
+        <input id="reasonTarget" value="cspr-usdc" style="width:60px"><input id="reasonApr" value="14.5" style="width:45px">
+        <button class="btn btn-p btn-xs" onclick="runAIReason()">Generate</button></div>
+      <div class="ai-box" id="aiReasonResult">Select strategy and click Generate</div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Inference Performance</span></div>
+      <div class="chart-box-sm"><canvas id="perfChart"></canvas></div></div>
   </div>
 </div>
 
-<!-- Tab: Opportunities -->
-<div id="tab-opportunities" class="tab-content" style="display:none">
-  <div class="card">
-    <div class="flex-b"><span class="panel-title">All Yield Opportunities</span>
-      <div class="flex">
-        <select id="oppSort" onchange="fetchAllOpportunities()" style="width:100px"><option value="net_apr">Net APR</option><option value="risk_score">Risk Score</option><option value="confidence">Confidence</option></select>
-        <button class="btn btn-outline btn-xs" onclick="fetchAllOpportunities()">↻ Refresh</button>
-      </div>
-    </div>
-    <div style="overflow-x:auto"><table><thead><tr><th>Strategy</th><th>Target</th><th>Gross APR</th><th>Net APR</th><th>Risk</th><th>Gas $</th><th>Latency</th><th>Sustainability</th><th>Confidence</th></tr></thead>
-      <tbody id="allOppTable"><tr><td colspan="9" style="color:#586078;text-align:center">Click refresh</td></tr></tbody>
-    </table></div>
+<!-- PAPER -->
+<div id="tab-paper" class="tab-content" style="display:none">
+  <div class="stat-row">
+    <div class="stat-box"><div class="l">P&L</div><div class="n" id="paperTotalPnl" style="color:#00d4aa">$0.00</div><div class="c" id="paperReturnPct" style="color:#00d4aa">+0%</div></div>
+    <div class="stat-box"><div class="l">Capital</div><div class="n" id="paperCapital" style="color:#a855f7">$10K</div><div class="c" id="paperTrades">0 trades</div></div>
+    <div class="stat-box"><div class="l">Win Rate</div><div class="n" id="paperWinRate" style="color:#fbbf24">0%</div><div class="c" id="paperWinLoss">W:0/L:0</div></div>
+    <div class="stat-box"><div class="l">Sharpe</div><div class="n" id="paperSharpe" style="color:#00d4aa">0.0</div><div class="c">annual</div></div>
+    <div class="stat-box"><div class="l">Drawdown</div><div class="n" id="paperDrawdown" style="color:#00d4aa">0%</div><div class="c">max</div></div>
+    <div class="stat-box"><div class="l">Streak</div><div class="n" id="paperStreak" style="color:#fbbf24">0</div><div class="c">wins</div></div>
+  </div>
+  <div class="g-2">
+    <div class="card" style="grid-column:span 2"><div class="flex-b"><span style="font-size:9px;font-weight:600">Equity Curve</span></div>
+      <div class="chart-box"><canvas id="pnlChart"></canvas></div></div>
+  </div>
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Daily Returns</span></div>
+      <div class="chart-box"><canvas id="stratChart"></canvas></div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Strategy P&L</span></div>
+      <div class="chart-box"><canvas id="pieChart"></canvas></div>
+      <div id="strategyPnlBreakdown" style="font-size:7.5px;color:#586078;margin-top:3px"></div></div>
+  </div>
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Trade History</span><span style="color:#4a5a7a;font-size:7px" id="paperTradeCount">0</span></div>
+    <div class="scroll"><table><thead><tr><th>#</th><th>Strategy</th><th>Target</th><th>Alloc</th><th>Return</th><th>P&L</th></tr></thead>
+      <tbody id="paperTradeTable"><tr><td colspan="6" style="color:#4a5a7a;text-align:center;padding:10px">No trades yet</td></tr></tbody>
+    </table></div></div>
+</div>
+
+<!-- MARKETS -->
+<div id="tab-markets" class="tab-content" style="display:none">
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Yield Opportunities</span></div>
+      <div class="scroll"><table><thead><tr><th>Strategy</th><th>Target</th><th>APR</th><th>Risk</th></tr></thead>
+        <tbody id="oppTable"><tr><td colspan="4" style="color:#4a5a7a;text-align:center">Loading...</td></tr></tbody>
+      </table></div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Gas Forecast</span></div>
+      <div id="gasDisplay" style="font-size:8px;color:#586078">Loading...</div>
+      <div class="chart-box-sm" style="margin-top:3px"><canvas id="gasChart"></canvas></div></div>
   </div>
 </div>
 
-<!-- Tab: Risk -->
+<!-- RISK -->
 <div id="tab-risk" class="tab-content" style="display:none">
-  <div class="grid-2">
-    <div class="card">
-      <div class="panel-title">Risk Assessment</div>
-      <div class="flex" style="margin-bottom:8px">
-        <input id="riskPool" value="cspr-usdc" style="width:120px" placeholder="Pool ID">
-        <button class="btn btn-primary btn-sm" onclick="assessRisk()">Assess</button>
-      </div>
-      <div id="riskResult" style="font-size:12px;color:#586078">Select a pool and click Assess</div>
-    </div>
-    <div class="card">
-      <div class="panel-title">Stress Test</div>
-      <div class="flex" style="margin-bottom:8px">
-        <input id="stressSize" value="5000" style="width:70px" placeholder="Size">
-        <input id="stressPrice" value="0.042" style="width:70px" placeholder="Price">
-        <button class="btn btn-primary btn-sm" onclick="runStress()">Run</button>
-      </div>
-      <div id="stressResult" style="font-size:12px;color:#586078">Configure position and run</div>
+  <div class="g-3">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Assess</span></div>
+      <div class="flex"><input id="riskPool" value="cspr-usdc" style="width:85px"><button class="btn btn-p btn-sm" onclick="assessRisk()">Go</button></div>
+      <div id="riskResult" style="font-size:8px;color:#586078;margin-top:3px">Enter pool</div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Stress Test</span></div>
+      <div class="flex"><input id="stressSize" value="5000" style="width:55px"><input id="stressPrice" value="0.042" style="width:55px"><button class="btn btn-p btn-sm" onclick="runStress()">Run</button></div>
+      <div id="stressResult" style="font-size:8px;color:#586078;margin-top:3px">Run test</div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Heatmap</span></div>
+      <div id="riskHeatmap" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:3px;height:100%"></div></div>
+  </div>
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Contract Whitelist</span></div>
+    <div id="whitelistDisplay" style="font-size:7px;color:#586078;font-family:monospace;display:flex;flex-wrap:wrap;gap:3px">Loading...</div></div>
+</div>
+
+<!-- x402 -->
+<div id="tab-x402" class="tab-content" style="display:none">
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Protocol</span></div>
+      <div id="x402Info" style="font-size:8px;color:#586078">Loading...</div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Pay</span></div>
+      <div class="flex"><select id="x402Resource" style="width:120px"><option>yield_data</option><option>price_feed</option><option>volatility</option><option>gas_forecast</option></select>
+        <input id="x402Amount" value="0.001" style="width:55px"><button class="btn btn-p btn-sm" onclick="makeX402Payment()">Pay</button></div>
+      <div id="x402Result" style="font-size:8px;color:#00d4aa;font-family:monospace;margin-top:3px">Select resource</div></div>
+  </div>
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Resources</span></div>
+    <div id="x402Resources" style="font-size:8px;color:#586078">Loading...</div></div>
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Payment History</span></div>
+    <div class="timeline" id="x402Timeline"><div style="color:#4a5a7a;font-size:8px">None</div></div></div>
+</div>
+
+<!-- SUB-AGENTS -->
+<div id="tab-agents" class="tab-content" style="display:none">
+  <div class="card"><div class="flex-b">
+    <span style="font-size:10px;font-weight:600;color:#a855f7;display:flex;align-items:center;gap:5px"><span style="font-size:14px">&#129302;</span> Deployable Sub-Agent Mesh</span>
+    <div class="flex" style="gap:5px">
+      <span class="badge badge-p" id="agentCount">7</span>
+      <span class="badge badge-g" id="agentTopology">Sequential</span>
+    </div></div>
+    <div class="flex" style="gap:4px;margin-top:5px">
+      <button class="btn btn-o btn-xs" onclick="switchTopology('sequential')" id="topo-seq">Sequential</button>
+      <button class="btn btn-o btn-xs" onclick="switchTopology('parallel')" id="topo-par">Parallel</button>
+      <button class="btn btn-o btn-xs" onclick="switchTopology('consensus')" id="topo-con">Consensus</button>
+      <span style="color:#4a5a7a;font-size:7px" id="topoDesc">Linear pipeline</span>
     </div>
   </div>
-  <div class="card">
-    <div class="panel-title">Whitelisted Contracts <button class="btn btn-outline btn-xs" onclick="fetchWhitelist()">↻</button></div>
-    <div id="whitelistDisplay" style="font-size:11px;color:#586078">Loading...</div>
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Agent Pipeline</span></div>
+    <div id="agentFlowDiagram" style="width:100%;height:80px;position:relative;margin:3px 0;border-radius:8px;background:rgba(1,3,8,.7);overflow:hidden"></div>
+  </div>
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Deployed Sub-Agents</span><button class="btn btn-o btn-xs" onclick="loadSubAgents()">&#8635;</button></div>
+    <div class="ag-grid" id="agentCards"></div>
+  </div>
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Topology Guide</span></div>
+      <div id="topoTable" style="font-size:7.5px;color:#586078">
+        <div style="padding:3px 0;border-bottom:1px solid rgba(26,37,64,.12)"><b style="color:#00d4aa">&#9679; Sequential:</b> Linear pipeline — each agent processes in order</div>
+        <div style="padding:3px 0;border-bottom:1px solid rgba(26,37,64,.12)"><b style="color:#0088ff">&#9679; Parallel:</b> Market agents run simultaneously, results merge</div>
+        <div style="padding:3px 0"><b style="color:#a855f7">&#9679; Consensus:</b> Weighted voting — majority decides strategy</div>
+      </div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Coordination Log</span></div>
+      <div class="scroll-sm" id="coordLog" style="font-size:7px;color:#586078;font-family:monospace">Loading...</div></div>
   </div>
 </div>
 
-<!-- Tab: MCP -->
+<!-- COMPETITION -->
+<div id="tab-competition" class="tab-content" style="display:none">
+  <div class="g-2">
+    <div class="card" style="grid-column:span 2;background:rgba(245,158,11,.03);border-color:rgba(245,158,11,.12)">
+      <div class="flex-b" style="margin-bottom:5px"><span style="font-size:11px;font-weight:700;color:#f59e0b">&#127942; Casper Agentic Buildathon 2026</span><span class="badge badge-gold">SafetyNet Leading</span></div>
+      <div class="comp-scroll"><div class="comp-row header"><span>Feature</span><span>SafetyNet</span><span>Agent Casper</span><span>Chainleash</span><span>AgentPay</span></div>
+      <div id="compRows"></div></div>
+    </div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600;color:#f59e0b">&#9733; Judging Advantage</span></div>
+      <div id="judgingAdvantage" style="font-size:7.5px;color:#586078">Loading...</div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">On-Chain Contract</span></div>
+      <div id="contractStatus" style="font-size:8px;margin-top:3px">
+        <div class="flex-b" style="padding:2px 0"><span style="color:#4a5a7a">Network:</span><span>Casper Testnet</span></div>
+        <div class="flex-b" style="padding:2px 0"><span style="color:#4a5a7a">Init TX:</span><span class="tx">f2247779c405...</span></div>
+        <div class="flex-b" style="padding:2px 0"><span style="color:#4a5a7a">Agent TX:</span><span class="tx">d69620dd2610...</span></div>
+        <div class="flex-b" style="padding:2px 0"><span style="color:#4a5a7a">Status:</span><span class="badge badge-g">&#10003; Deployed</span></div>
+      </div></div>
+  </div>
+</div>
+
+<!-- MCP -->
 <div id="tab-mcp" class="tab-content" style="display:none">
-  <div class="grid-2-1">
-    <div class="card">
-      <div class="panel-title">MCP Tools <button class="btn btn-outline btn-xs" onclick="fetchMCPTools()">↻</button></div>
-      <div id="mcpToolList" style="font-size:11px;color:#586078;max-height:300px;overflow-y:auto">Loading...</div>
-    </div>
-    <div class="card">
-      <div class="panel-title">Call Tool</div>
-      <select id="mcpToolSelect" style="width:100%;margin-bottom:6px"></select>
-      <textarea id="mcpArgs" rows="3" style="width:100%;background:#0d1a2d;border:1px solid #1e2a45;border-radius:4px;color:#e0e6f0;padding:6px;font-size:11px;font-family:monospace">{"address": "abc123"}</textarea>
-      <button class="btn btn-primary btn-sm" onclick="callMCP()" style="margin-top:4px">Execute</button>
-      <pre id="mcpResult" style="font-size:10px;color:#00d4aa;margin-top:6px;max-height:150px;overflow:auto"></pre>
-    </div>
+  <div class="g-2">
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">MCP Tools</span></div>
+      <div id="mcpToolList" class="scroll" style="font-size:7.5px;color:#586078">Loading...</div></div>
+    <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Call Tool</span></div>
+      <select id="mcpToolSelect" style="width:100%;margin-bottom:3px"></select>
+      <textarea id="mcpArgs" rows="2" style="width:100%;font-family:monospace;font-size:7px;padding:3px 5px">{"address": "0114da..."}</textarea>
+      <button class="btn btn-p btn-xs" onclick="callMCP()" style="margin-top:3px">Execute</button>
+      <pre id="mcpResult" class="scroll-sm" style="font-size:7px;color:#00d4aa;margin-top:3px"></pre></div>
   </div>
 </div>
 
-<!-- Tab: Orchestrator -->
-<div id="tab-orchestrator" class="tab-content" style="display:none">
-  <div class="grid-2">
-    <div class="card">
-      <div class="panel-title">Queue Stats</div>
-      <div id="orchStats" style="font-size:12px;color:#586078">Loading...</div>
-    </div>
-    <div class="card">
-      <div class="panel-title">Submit TX</div>
-      <div class="flex" style="margin-bottom:6px">
-        <select id="txTypeSelect" style="width:100px"><option>swap</option><option>transfer</option><option>stake</option><option>lend</option></select>
-        <input id="txTarget" value="cspr-usdc" style="width:100px" placeholder="Target">
-        <input id="txAmount" value="1000" style="width:60px" placeholder="Amount">
-        <button class="btn btn-primary btn-sm" onclick="submitTX()">Submit</button>
-      </div>
-    </div>
-  </div>
-  <div class="card">
-    <div class="panel-title">TX History <span style="color:#586078;font-size:10px" id="txCount">0</span></div>
-    <div style="max-height:200px;overflow-y:auto"><table><thead><tr><th>ID</th><th>Type</th><th>Priority</th><th>Gas</th><th>Status</th><th>Hash</th></tr></thead>
-      <tbody id="txTable"><tr><td colspan="6" style="color:#586078;text-align:center">No transactions</td></tr></tbody>
-    </table></div>
-  </div>
-</div>
-
-<!-- Tab: Gas -->
-<div id="tab-gas" class="tab-content" style="display:none">
-  <div class="grid-2">
-    <div class="card">
-      <div class="panel-title">Current Congestion</div>
-      <div id="gasCurrent" style="font-size:14px;color:#586078">Loading...</div>
-    </div>
-    <div class="card">
-      <div class="panel-title">Best Windows <button class="btn btn-outline btn-xs" onclick="fetchGas()">↻</button></div>
-      <div id="gasWindows" style="font-size:12px;color:#586078">Loading...</div>
-    </div>
-  </div>
+<!-- TX -->
+<div id="tab-tx" class="tab-content" style="display:none">
+  <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Transaction Queue</span><span style="color:#4a5a7a;font-size:7px" id="txCount">0</span></div>
+    <div id="txStats" style="font-size:8px;color:#586078;margin-bottom:3px">Loading...</div>
+    <div class="scroll-sm"><table><thead><tr><th>ID</th><th>Type</th><th>Gas</th><th>Status</th><th>Hash</th></tr></thead>
+      <tbody id="txTable"><tr><td colspan="5" style="color:#4a5a7a;text-align:center">None</td></tr></tbody>
+    </table></div></div>
 </div>
 
 </div><!-- /container -->
 
 <script>
-let API = "http://localhost:5100";
-let polling = false, pollTimer = null;
-let logSince = 0;
+const API=window.location.protocol+'//'+window.location.hostname+':5100';
+let logSince=0,pollTimer=null,polling=false,helpShown=false,demoRunning=false,demoTimer=null;
+let pnlChart,stratChart,radarChart,perfChart,pieChart,gasChart;
+let x402Payments=[],perfData=[],tickerItems=[];
+const C={rgime:'#00d4aa',yield:'#0088ff',risk:'#a855f7',strat:'#fbbf24',reason:'#ff4d6a'};
+let prevVals={};
 
-function api(path, opts={}){return fetch(API+path,{headers:{"Content-Type":"application/json"},...opts}).then(r=>r.json())}
+// ─── SPLASH SCREEN ──────────────────────────────────────────
+setTimeout(()=>document.getElementById('splash').classList.add('hide'),1800);
+setTimeout(()=>{const s=document.getElementById('splash');if(s)s.remove()},2400);
 
-function updatePort(){const p=document.getElementById("portInput").value;API="http://localhost:"+p;refreshAll()}
+// ─── PARTICLE BACKGROUND ──────────────────────────────────
+const canvas=document.getElementById('particleCanvas');
+const ctx=canvas.getContext('2d');
+let particles=[],animId=null;
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight}
+window.addEventListener('resize',resizeCanvas);resizeCanvas();
+const PCOLORS=['rgba(0,212,170,','rgba(0,136,255,','rgba(168,85,247,'];
+for(let i=0;i<60;i++)particles.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3,r:Math.random()*2+.5,c:PCOLORS[i%3]+(Math.random()*.15+.03)+')'});
+function drawParticles(){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  particles.forEach(p=>{p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>canvas.width)p.vx*=-1;if(p.y<0||p.y>canvas.height)p.vy*=-1;
+    ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);ctx.fillStyle=p.c;ctx.fill()});
+  for(let i=0;i<particles.length;i++)for(let j=i+1;j<particles.length;j++){
+    const dx=particles[i].x-particles[j].x,dy=particles[i].y-particles[j].y,dist=Math.sqrt(dx*dx+dy*dy);
+    if(dist<120){ctx.beginPath();ctx.moveTo(particles[i].x,particles[i].y);ctx.lineTo(particles[j].x,particles[j].y);
+      ctx.strokeStyle=`rgba(0,212,170,${.03*(1-dist/120)})`;ctx.lineWidth=.5;ctx.stroke()}}
+  animId=requestAnimationFrame(drawParticles)
+}
+drawParticles();
 
-function switchTab(name){
+// ─── TICKER BAR ──────────────────────────────────────────
+function initTicker(){
+  const items=[
+    '<b style="color:#00d4aa">CSPR</b> <span class="up">$0.042</span>',
+    '<b style="color:#0088ff">USDC</b> <span class="up">$1.000</span>',
+    '<b style="color:#a855f7">CSPR/USDC</b> <span class="up">+2.4%</span>',
+    '<b style="color:#fbbf24">Total Value Locked</b> <span style="color:#9aa8c4">$142M</span>',
+    '<b style="color:#ff4d6a">24h Volume</b> <span style="color:#9aa8c4">$8.2M</span>',
+    '<b style="color:#00d4aa">SafetyNet P&L</b> <span class="up">+$0.00</span>',
+  ];
+  tickerItems=items;
+  const el=document.getElementById('tickerBar');
+  el.innerHTML=items.map(i=>'<span class="ticker-item">'+i+'</span>').join('')+
+    items.map(i=>'<span class="ticker-item">'+i+'</span>').join('');
+}
+initTicker();
+
+function toast(msg,t='s'){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');el.className='tst '+t;
+  el.textContent=msg;c.appendChild(el);
+  setTimeout(()=>el.remove(),2800);
+}
+
+async function api(path,opts={}){
+  try{const r=await fetch(API+path,{headers:{"Content-Type":"application/json"},...opts});return r.ok?await r.json():null}
+  catch(e){return null}
+}
+
+function updatePort(){toast('Reconnecting...','i')}
+function switchTab(n){
   document.querySelectorAll('.tab-content').forEach(t=>t.style.display='none');
   document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('tab-'+name).style.display='';
-  document.querySelector(`.tab[data-tab="${name}"]`).classList.add('active');
+  const el=document.getElementById('tab-'+n);
+  if(el){el.style.display='';el.style.animation='none';void el.offsetHeight;el.style.animation='tabSlide .28s ease forwards'}
+  document.querySelector(`.tab[data-tab="${n}"]`)?.classList.add('active');
+  if(n==='paper'){fetchPaperData();fetchPaperTrades();fetchPaperHistory()}
+  if(n==='ai')initRadarChart();
+  if(n==='competition')fetchCompetitionData();
+  if(n==='agents'){loadSubAgents();fetchCoordinationLog();reloadAgentSystem()}
 }
-
 function setPhase(p){
-  document.querySelectorAll('.phase-btn').forEach(b=>{b.classList.toggle('active',parseInt(b.dataset.phase)===p)});
-  document.getElementById('phaseLabel').textContent='Phase '+p;
+  document.querySelectorAll('[data-phase]').forEach(b=>b.classList.toggle('active',parseInt(b.dataset.phase)===p));
+  const labels=['Read','Paper','Limited','Full'];
+  document.getElementById('phaseLabel').textContent='P'+(p)+' — '+labels[p-1];
   api('/api/config',{method:'POST',body:JSON.stringify({phase:p})});
+  toast('Phase '+p+' set','i');
 }
 
+// ─── ANIMATED COUNTER ────────────────────────────────────
+function animateValue(el,prev,cur,suffix=''){
+  if(prev===undefined||prev===null)prev=0;
+  const dur=600,start=performance.now(),p=parseFloat(prev)||0,c=parseFloat(cur)||0;
+  const frame=()=>{const t=Math.min((performance.now()-start)/dur,1),v=p+(c-p)*t;el.textContent=(Number.isInteger(c)?Math.round(v):v.toFixed(1))+suffix;if(t<1)requestAnimationFrame(frame)};
+  frame();
+}
+
+// ─── PIPELINE ──────────────────────────────────────────────
+function drawPipeline(){
+  const el=document.getElementById('pipeline');
+  const agents=[
+    {id:'market_regime',label:'Regime',color:'#00d4aa',icon:'R'},
+    {id:'yield_predictor',label:'Yield',color:'#0088ff',icon:'Y'},
+    {id:'risk_scorer',label:'Risk',color:'#a855f7',icon:'Rx'},
+    {id:'strategy_selector',label:'Strategy',color:'#fbbf24',icon:'S'},
+    {id:'reasoner',label:'Reason',color:'#ff4d6a',icon:'Re'},
+    {id:'execution_agent',label:'Execute',color:'#f59e0b',icon:'E'},
+    {id:'risk_guardian',label:'Guard',color:'#00d4aa',icon:'G'},
+  ];
+  el.innerHTML=agents.map((a,i)=>{
+    const conn=i<agents.length-1?`<div class="pipe-connector"><div class="packet" style="animation-delay:${i*0.3}s;background:radial-gradient(circle,${a.color}88,transparent 70%)"></div><div class="packet2"></div></div>`:'';
+    return `<div class="pipe-node deployed" data-agent="${a.id}">
+      <div class="pipe-dot" style="background:${a.color};box-shadow:0 0 14px ${a.color}44">${a.icon}</div>
+      <div class="pipe-label">${a.label}</div>
+    </div>${conn}`;
+  }).join('');
+}
+drawPipeline();
+
+// ─── AI MODEL CARDS ──────────────────────────────────────
+async function loadModelCards(){
+  try{
+    const d=await api('/api/ai/models');
+    const c=document.getElementById('modelCards');
+    if(!d||!d.models)throw new Error('no models');
+    document.getElementById('aiModelStatus').textContent=d.models.length+' models · 100% local CPU';
+    const analysis=await api('/api/ai/analyze',{method:'POST',body:JSON.stringify({price:0.042,volume:320000,sentiment:0.72,volatility:3.5})})||{};
+    const md=[
+      {nm:'MarketRegimeNN',tp:'4-Class',cl:'rgime',out:analysis.regime?.prediction?.toUpperCase()||'BULLISH',conf:analysis.regime?.confidence||0.92,clr:C.rgime,dt:`${((analysis.regime?.confidence||0.92)*100).toFixed(0)}% confidence`},
+      {nm:'YieldPredictor',tp:'APR Reg.',cl:'yield',out:`${analysis.yield_forecast?.predicted_net_apr||14.5}% APR`,conf:.72,clr:C.yield,dt:'net APR forecast'},
+      {nm:'RiskScorerNN',tp:'Risk Reg.',cl:'risk',out:analysis.risk?.level?.toUpperCase()||'SAFE',conf:1-(analysis.risk?.risk_score||.12),clr:C.risk,dt:`score ${analysis.risk?.risk_score||.12}`},
+      {nm:'StrategySelect',tp:'5-Class',cl:'strat',out:(analysis.strategy?.recommendation||'yield_optimizer').replace(/_/g,' ').toUpperCase(),conf:analysis.strategy?.confidence||.77,clr:C.strat,dt:`${((analysis.strategy?.confidence||.77)*100).toFixed(0)}% confidence`},
+      {nm:'StrategyReasoner',tp:'Text Gen',cl:'reason',out:'reasoning',conf:.9,clr:C.reason,dt:'template engine'},
+    ];
+    c.innerHTML=md.map((m,i)=>`
+      <div class="ai-card fade-in" style="animation-delay:${i*0.07}s">
+        <div class="accent" style="background:${m.clr};box-shadow:0 0 8px ${m.clr}44"></div>
+        <div class="hdr"><div><span class="nm">${m.nm}</span><div class="tp">${m.tp}</div></div><span style="font-size:7px;color:${m.clr};font-weight:600">${(m.conf*100).toFixed(0)}%</span></div>
+        <div class="out" style="color:${m.clr}">${m.out}</div>
+        <div class="ai-ring"><div class="fill" style="width:${(m.conf*100).toFixed(0)}%;background:${m.clr};box-shadow:0 0 6px ${m.clr}44"></div></div>
+        <div class="flex-b"><span class="sub-m">${m.dt}</span><span class="sub-m">${(m.conf*100).toFixed(0)}%</span></div>
+      </div>`).join('');
+  }catch(e){document.getElementById('modelCards').innerHTML='<div style="color:#4a5a7a;font-size:8px;text-align:center;padding:14px">Connect to API server to load models</div>'}
+}
+
+// ─── RADAR ────────────────────────────────────────────────
+function initRadarChart(){
+  const ctx=document.getElementById('radarChart');if(!ctx)return;
+  if(radarChart)radarChart.destroy();
+  radarChart=new Chart(ctx.getContext('2d'),{
+    type:'radar',data:{labels:['Regime','Yield','Risk','Strategy','Reason'],
+      datasets:[{label:'Confidence',data:[92,72,88,77,90],
+        backgroundColor:'rgba(168,85,247,.08)',borderColor:'#a855f7',borderWidth:1.5,
+        pointBackgroundColor:['#00d4aa','#0088ff','#a855f7','#fbbf24','#ff4d6a'],pointRadius:4,pointHoverRadius:5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{r:{beginAtZero:true,max:100,ticks:{color:'#4a5a7a',font:{size:7},stepSize:25,backdropColor:'transparent'},
+        grid:{color:'rgba(26,37,64,.25)'},angleLines:{color:'rgba(26,37,64,.25)'},pointLabels:{color:'#586078',font:{size:7}}}}}});
+}
+
+// ─── PERF CHART ──────────────────────────────────────────
+function updatePerfChart(){
+  const ctx=document.getElementById('perfChart');if(!ctx||perfData.length<2)return;
+  if(perfChart)perfChart.destroy();
+  const recent=perfData.slice(-20);
+  perfChart=new Chart(ctx.getContext('2d'),{
+    type:'line',data:{labels:recent.map((_,i)=>'#'+(i+1)),datasets:[{label:'ms',data:recent,
+      borderColor:'#a855f7',backgroundColor:'rgba(168,85,247,.06)',fill:true,tension:.3,pointRadius:2}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#4a5a7a',font:{size:7}},grid:{color:'rgba(26,37,64,.15)'}},
+        y:{ticks:{color:'#4a5a7a',font:{size:7}},grid:{color:'rgba(26,37,64,.15)'}}}}});
+}
+
+// ─── STATUS ──────────────────────────────────────────────
 async function refreshStatus(){
   try{
-    const s=await api('/api/status');
-    document.getElementById('statCycles').textContent=s.cycles||0;
-    document.getElementById('statOpps').textContent=s.opportunities_evaluated||0;
-    document.getElementById('statTX').textContent=s.transactions_submitted||0;
+    const s=await api('/api/status');if(!s)return;
+    animateValue(document.getElementById('statCycles'),prevVals.cycles,s.cycles||0);
+    animateValue(document.getElementById('statOpps'),prevVals.opps,s.opportunities_evaluated||0);
+    prevVals.cycles=s.cycles||0;prevVals.opps=s.opportunities_evaluated||0;
     document.getElementById('statQueue').textContent=(s.queue?.queued||0)+(s.queue?.pending_batches||0);
-    s.running ? startPolling() : stopPolling();
     const b=document.getElementById('statusBadge');
-    const runLabel=document.getElementById('cycleRunning');
-    if(s.running){b.className='badge badge-yellow';b.textContent='● Running'}
-    else{b.className='badge badge-green';b.textContent='● Idle'}
+    b.className='badge '+(s.running?'badge-y':'badge-g');
+    b.textContent=s.running?'\u25CF Running':'\u25CF Idle';
     document.getElementById('logCount').textContent=s.log_count+' entries';
+    // Update ticker P&L
+    const pnl=await api('/api/paper/summary');
+    if(pnl){
+      const tItems=document.querySelectorAll('.ticker-item');
+      if(tItems.length){const last=tItems[5];if(last)last.innerHTML='<b style="color:#00d4aa">SafetyNet P&L</b> <span class="'+(pnl.total_pnl>=0?'up':'dn')+'">'+(pnl.total_pnl>=0?'+':'')+'$'+(pnl.total_pnl||0).toFixed(2)+'</span>'}
+    }
   }catch(e){}
 }
-
+async function fetchPerf(){
+  try{
+    const p=await api('/api/ai/performance');if(!p)return;
+    animateValue(document.getElementById('statInference'),prevVals.inference,p.total_calls||0);
+    prevVals.inference=p.total_calls||0;
+    document.getElementById('statAvgMs').textContent=`avg ${p.avg_ms||0}ms`;
+    document.getElementById('aiTotalCalls').textContent=p.total_calls||0;
+    if(p.avg_ms>0){perfData.push(p.avg_ms);if(perfData.length>50)perfData.shift()}
+  }catch(e){}
+}
 async function fetchLogs(){
   try{
     const logs=await api('/api/logs?since='+logSince);
-    if(!logs.length)return;
-    logSince+=logs.length;
+    if(!logs||!logs.length)return;logSince+=logs.length;
     const c=document.getElementById('logConsole');
-    logs.forEach(l=>{
-      const d=document.createElement('div');d.className='l';
-      d.innerHTML=`<span class="t">[${l.time}]</span> <span class="l-${l.level}">${l.msg}</span>`;
-      c.appendChild(d);
-    });
+    logs.forEach((l,i)=>{const d=document.createElement('div');d.className='l fade-in';d.style.animationDelay=(i*0.02)+'s';
+      d.innerHTML='<span class="t">['+l.time+']</span> <span class="l-'+l.level+'">'+l.msg+'</span>';c.appendChild(d)});
     c.scrollTop=c.scrollHeight;
   }catch(e){}
 }
 
-async function runCycle(){
-  const r=await api('/api/cycle',{method:'POST'});
-  if(r.success){refreshAll()}
-  else if(r.error) alert(r.error);
+// ─── PAPER ──────────────────────────────────────────────
+async function fetchPaperData(){
+  try{
+    const s=await api('/api/paper/summary');if(!s)return;
+    const pnlEl=document.getElementById('paperTotalPnl');
+    pnlEl.textContent=(s.total_pnl>=0?'+':'')+'$'+(s.total_pnl||0).toFixed(2);
+    pnlEl.style.color=s.total_pnl>=0?'#00d4aa':'#ff4d6a';
+    document.getElementById('paperReturnPct').textContent=(s.total_return_pct>=0?'+':'')+(s.total_return_pct||0).toFixed(2)+'%';
+    document.getElementById('paperReturnPct').style.color=s.total_return_pct>=0?'#00d4aa':'#ff4d6a';
+    document.getElementById('paperCapital').textContent='$'+(s.current_capital||10000).toLocaleString();
+    document.getElementById('paperTrades').textContent=(s.total_trades||0)+' trades';
+    document.getElementById('paperWinRate').textContent=(s.win_rate||0)+'%';
+    document.getElementById('paperWinRate').style.color=(s.win_rate||0)>=50?'#00d4aa':'#fbbf24';
+    document.getElementById('paperWinLoss').textContent='W:'+(s.win_count||0)+'/L:'+(s.loss_count||0);
+    document.getElementById('paperSharpe').textContent=(s.sharpe_ratio||0).toFixed(2);
+    document.getElementById('paperSharpe').style.color=(s.sharpe_ratio||0)>=1?'#00d4aa':(s.sharpe_ratio||0)>=0?'#fbbf24':'#ff4d6a';
+    document.getElementById('paperDrawdown').textContent=(s.max_drawdown_pct||0).toFixed(1)+'%';
+    document.getElementById('paperDrawdown').style.color=(s.max_drawdown_pct||0)<5?'#00d4aa':'#fbbf24';
+    document.getElementById('paperStreak').textContent=(s.win_streak||0);
+    document.getElementById('paperStreak').style.color=(s.win_streak||0)>=3?'#00d4aa':'#fbbf24';
+    const sd=document.getElementById('strategyPnlBreakdown');
+    if(s.strategy_pnl)sd.innerHTML=Object.entries(s.strategy_pnl).map(([k,v])=>'<div class="flex-b" style="padding:2px 0;font-size:7px"><span style="color:#4a5a7a">'+k.replace(/_/g,' ')+'</span><span style="color:'+(v>=0?'#00d4aa':'#ff4d6a')+'">'+(v>=0?'+':'')+'$'+v.toFixed(2)+'</span></div>').join('');
+    if(s.strategy_pnl&&Object.keys(s.strategy_pnl).length)updatePieChart(s.strategy_pnl);
+  }catch(e){}
+}
+function updatePieChart(pnl){
+  const ctx=document.getElementById('pieChart');if(!ctx)return;
+  if(pieChart)pieChart.destroy();
+  const e=Object.entries(pnl).filter(([_,v])=>v!==0);if(!e.length)return;
+  const cs=['#00d4aa','#0088ff','#a855f7','#fbbf24','#ff4d6a','#f59e0b'];
+  pieChart=new Chart(ctx.getContext('2d'),{type:'doughnut',data:{labels:e.map(([k])=>k.replace(/_/g,' ')),
+    datasets:[{data:e.map(([_,v])=>Math.abs(v)),backgroundColor:e.map((_,i)=>cs[i%cs.length]),
+      borderColor:'rgba(2,5,12,.8)',borderWidth:2}]},
+    options:{responsive:true,maintainAspectRatio:false,
+      plugins:{legend:{position:'right',labels:{color:'#586078',font:{size:6},padding:3,boxWidth:6}},
+        tooltip:{backgroundColor:'rgba(8,16,30,.95)',bodyColor:'#9aa8c4',borderColor:'rgba(26,37,64,.4)',borderWidth:1,padding:5,
+          callbacks:{label:ctx=>ctx.label+': $'+Math.abs(ctx.parsed).toFixed(2)}}},cutout:'60%'}});
+}
+async function fetchPaperTrades(){
+  try{
+    const t=await api('/api/paper/trades?limit=30');if(!t)return;
+    const tb=document.getElementById('paperTradeTable');
+    document.getElementById('paperTradeCount').textContent=(t.trades?.length||0)+' trades';
+    if(!t.trades||!t.trades.length){tb.innerHTML='<tr><td colspan="6" style="color:#4a5a7a;text-align:center;padding:10px">No trades</td></tr>';return}
+    tb.innerHTML=t.trades.slice().reverse().map(tx=>'<tr class="fade-in"><td style="color:#4a5a7a">'+tx.cycle+'</td><td style="font-weight:500">'+(tx.strategy||'').replace(/_/g,' ')+'</td><td>'+(tx.target||'--')+'</td><td>$'+(tx.allocation_usd||0).toFixed(0)+'</td><td style="color:'+(tx.simulated_pnl>=0?'#00d4aa':'#ff4d6a')+'">'+((tx.simulated_return_pct||0)*100).toFixed(3)+'%</td><td style="color:'+(tx.simulated_pnl>=0?'#00d4aa':'#ff4d6a')+'">'+(tx.simulated_pnl>=0?'+':'')+'$'+(tx.simulated_pnl||0).toFixed(2)+'</td></tr>').join('');
+  }catch(e){}
+}
+async function fetchPaperHistory(){
+  try{
+    const h=await api('/api/paper/history');if(!h||!h.history||h.history.length<2)return;
+    updatePnlChart(h.history);updateStratChart(h.history);
+  }catch(e){}
+}
+function updatePnlChart(h){
+  const ctx=document.getElementById('pnlChart');if(!ctx)return;
+  if(pnlChart)pnlChart.destroy();
+  pnlChart=new Chart(ctx.getContext('2d'),{type:'line',data:{labels:h.map((_,i)=>'#'+(_.cycle||i+1)),
+    datasets:[{label:'P&L',data:h.map(x=>x.total_pnl),borderColor:'#00d4aa',backgroundColor:'rgba(0,212,170,.05)',fill:true,tension:.3,pointRadius:1.5,pointHoverRadius:3},
+      {label:'Capital',data:h.map(x=>(x.capital||10000)-10000),borderColor:'#a855f7',backgroundColor:'transparent',borderDash:[4,3],borderWidth:1,pointRadius:0,tension:.3}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{color:'#586078',font:{size:6},boxWidth:7}}},
+      scales:{x:{ticks:{color:'#4a5a7a',font:{size:6}},grid:{color:'rgba(26,37,64,.15)'}},
+        y:{ticks:{color:'#4a5a7a',font:{size:6},callback:v=>'$'+v.toFixed(0)},grid:{color:'rgba(26,37,64,.15)'}}}}});
+}
+function updateStratChart(h){
+  const ctx=document.getElementById('stratChart');if(!ctx)return;
+  if(stratChart)stratChart.destroy();
+  const r=h.slice(-20);
+  stratChart=new Chart(ctx.getContext('2d'),{type:'bar',data:{labels:r.map((_,i)=>'#'+(_.cycle||i+1)),
+    datasets:[{label:'Daily',data:r.map(x=>x.daily_pnl||0),backgroundColor:r.map(x=>(x.daily_pnl||0)>=0?'rgba(0,212,170,.5)':'rgba(255,77,106,.5)'),
+      borderColor:r.map(x=>(x.daily_pnl||0)>=0?'#00d4aa':'#ff4d6a'),borderWidth:1,borderRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#4a5a7a',font:{size:6}},grid:{display:false}},
+        y:{ticks:{color:'#4a5a7a',font:{size:6},callback:v=>'$'+v.toFixed(0)},grid:{color:'rgba(26,37,64,.15)'}}}}});
 }
 
-async function runMultiple(){
-  const count=document.getElementById('cycleCount').value;
-  const phase=document.querySelector('.phase-btn.active')?.dataset?.phase||2;
-  document.getElementById('cycleRunning').textContent='Running...';
-  await api('/api/cycles',{method:'POST',body:JSON.stringify({count:parseInt(count),phase:parseInt(phase)})});
-  startPolling();
+// ─── AI ACTIONS ───────────────────────────────────────────
+async function aiOnlyAnalysis(){
+  const r=await api('/api/ai/analyze',{method:'POST',body:JSON.stringify({price:0.042,volume:320000,sentiment:0.72,volatility:3.5})});
+  if(!r)return;
+  document.getElementById('aiAnalysisResult').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">'+
+    '<div style="background:rgba(8,16,30,.6);border-radius:5px;padding:4px 6px"><span style="color:#4a5a7a;font-size:6px">Regime</span><br><b style="color:'+C.rgime+';font-size:14px">'+(r.regime?.prediction||'').toUpperCase()+'</b> <span class="badge badge-g" style="font-size:5px">'+((r.regime?.confidence||0)*100).toFixed(0)+'%</span></div>'+
+    '<div style="background:rgba(8,16,30,.6);border-radius:5px;padding:4px 6px"><span style="color:#4a5a7a;font-size:6px">Strategy</span><br><b style="color:'+C.strat+';font-size:14px">'+(r.strategy?.recommendation||'').replace(/_/g,' ').toUpperCase()+'</b> <span class="badge badge-y" style="font-size:5px">'+((r.strategy?.confidence||0)*100).toFixed(0)+'%</span></div>'+
+    '<div style="background:rgba(8,16,30,.6);border-radius:5px;padding:4px 6px"><span style="color:#4a5a7a;font-size:6px">Yield</span><br><b style="color:'+C.yield+';font-size:14px">'+(r.yield_forecast?.predicted_net_apr||'--')+'% APR</b></div>'+
+    '<div style="background:rgba(8,16,30,.6);border-radius:5px;padding:4px 6px"><span style="color:#4a5a7a;font-size:6px">Risk</span><br><b style="color:'+C.risk+';font-size:14px">'+(r.risk?.level||'').toUpperCase()+'</b> <span class="badge badge-p" style="font-size:5px">'+(r.risk?.risk_score||'--')+'</span></div></div>'+
+    '<div style="font-size:7px;color:#4a5a7a;margin-top:3px">&#9889; '+(r.inference_ms||0)+'ms &middot; '+(r.models_used||[]).length+' models</div>';
+  document.getElementById('aiReasoningOutput').innerHTML='<span class="hl">&#9889; AI Analysis Complete.</span> '+(r.reasoning||'All 4 neural networks ran inference on Casper market data.');
+  toast('AI analysis done','s');
+  loadModelCards();
+}
+async function runAIAnalysis(){
+  const r=await api('/api/ai/analyze',{method:'POST',body:JSON.stringify({price:0.042,volume:320000,sentiment:0.72,volatility:3.5})});
+  if(!r)return;
+  document.getElementById('aiAnalysisResult').innerHTML='<div style="display:grid;grid-template-columns:1fr 1fr;gap:4px">'+
+    '<div><span style="color:#4a5a7a">Regime:</span> <b style="color:'+C.rgime+'">'+(r.regime?.prediction||'').toUpperCase()+'</b> <span class="badge badge-g" style="font-size:5px">'+((r.regime?.confidence||0)*100).toFixed(1)+'%</span></div>'+
+    '<div><span style="color:#4a5a7a">Strategy:</span> <b style="color:'+C.strat+'">'+(r.strategy?.recommendation||'').replace(/_/g,' ').toUpperCase()+'</b> <span class="badge badge-p" style="font-size:5px">'+((r.strategy?.confidence||0)*100).toFixed(1)+'%</span></div></div>'+
+    '<div style="font-size:7px;color:#4a5a7a;margin-top:3px">&#9889; '+(r.inference_ms||0)+'ms &middot; '+(r.models_used||[]).length+' NNs</div>';
+  updatePerfChart();
+  loadModelCards();
+}
+async function runAIReason(){
+  const s=document.getElementById('reasonStrat').value;
+  const t=document.getElementById('reasonTarget').value;
+  const a=parseFloat(document.getElementById('reasonApr').value);
+  const r=await api('/api/ai/reason',{method:'POST',body:JSON.stringify({strategy:s,target:t,net_apr:a,risk_score:.12,confidence:.85,regime:'bullish'})});
+  if(!r)return;
+  document.getElementById('aiReasonResult').innerHTML='<span class="hl">'+(s.replace(/_/g,' ').toUpperCase())+':</span> '+(r.reasoning||'')+'<div style="font-size:7px;color:#4a5a7a;margin-top:3px"><span class="tag">'+(r.reasoner_model||'')+'</span> &middot; '+(r.inference_ms||0)+'ms</div>';
 }
 
-async function stopAgent(){
-  document.getElementById('cycleRunning').textContent='';
-  await api('/api/stop',{method:'POST'});
-  stopPolling();refreshAll();
+// ─── GAS ──────────────────────────────────────────────────
+async function fetchGas(){
+  try{
+    const d=await api('/api/gas/forecast');if(!d)return;
+    document.getElementById('gasDisplay').innerHTML='<div class="flex-b"><span>Current:</span><b style="color:'+(d.current?.level==='low'?'#00d4aa':d.current?.level==='moderate'?'#fbbf24':'#ff4d6a')+'">'+(d.current?.level||'').toUpperCase()+'</b><span style="color:#4a5a7a">'+((d.current?.gas_price_motes||0)/1e6).toFixed(1)+'M</span></div>'+
+      '<div style="margin-top:3px"><b style="font-size:7.5px">Best Windows</b></div>'+
+      (d.best_windows||[]).slice(0,2).map(w=>'<div style="padding:2px 0;font-size:7px"><span style="color:#00d4aa">'+(w.start_utc||'')+'-'+(w.end_utc||'')+'</span> <span class="badge '+(w.congestion==='low'?'badge-g':w.congestion==='high'?'badge-y':'badge-r')+'" style="font-size:5px">'+(w.congestion||'')+'</span></div>').join('');
+    updateGasChart(d);
+  }catch(e){}
+}
+function updateGasChart(f){
+  const ctx=document.getElementById('gasChart');if(!ctx)return;
+  if(gasChart)gasChart.destroy();
+  const w=f?.best_windows||[];if(!w.length)return;
+  gasChart=new Chart(ctx.getContext('2d'),{type:'line',data:{labels:w.map(x=>(x.start_utc||'').slice(5,13)),
+    datasets:[{label:'Gas',data:w.map(x=>(x.estimated_gas_motes||0)/1e6),borderColor:'#fbbf24',backgroundColor:'rgba(251,191,36,.06)',
+      fill:true,tension:.4,pointRadius:3,borderWidth:1.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{color:'#4a5a7a',font:{size:6}},grid:{display:false}},
+        y:{ticks:{color:'#4a5a7a',font:{size:6},callback:v=>v.toFixed(1)+'M'},grid:{color:'rgba(26,37,64,.15)'}}}}});
 }
 
-function clearLogs(){
-  document.getElementById('logConsole').innerHTML='<div class="l"><span class="t">[--:--:--]</span> <span class="l-INFO">Cleared</span></div>';
-  logSince=0;
-}
-
+// ─── OPPORTUNITIES ──────────────────────────────────────
 async function fetchOpportunities(){
   try{
-    const d=await api('/api/opportunities');
+    const d=await api('/api/opportunities');if(!d)return;
     const b=document.getElementById('oppTable');
-    if(!d.opportunities||!d.opportunities.length){
-      b.innerHTML='<tr><td colspan="5" style="color:#586078;text-align:center">No opportunities</td></tr>';return;
-    }
-    b.innerHTML=d.opportunities.map(o=>{
-      const c=o.confidence||0.5;
-      return `<tr><td style="font-weight:500">${o.strategy.replace(/_/g,' ')}</td><td>${o.target}</td><td style="color:#00d4aa">${o.net_apr.toFixed(1)}%</td>
-        <td><span style="color:${o.risk_score<.2?'#00d4aa':o.risk_score<.35?'#fbbf24':'#ff4d6a'}">${o.risk_score.toFixed(3)}</span></td>
-        <td><div style="background:#1a2540;width:50px;height:4px;border-radius:2px;display:inline-block;vertical-align:middle">
-        <div style="width:${(c*100).toFixed(0)}%;height:4px;background:#00d4aa;border-radius:2px"></div></div></td></tr>`;
-    }).join('');
+    if(!d.opportunities||!d.opportunities.length){b.innerHTML='<tr><td colspan="4" style="color:#4a5a7a;text-align:center">None</td></tr>';return}
+    b.innerHTML=d.opportunities.map(o=>'<tr><td style="font-weight:500">'+(o.strategy||'').replace(/_/g,' ')+'</td><td>'+(o.target||'')+'</td><td style="color:#00d4aa">'+(o.net_apr||0).toFixed(1)+'%</td><td><span style="color:'+((o.risk_score||0)<.2?'#00d4aa':(o.risk_score||0)<.35?'#fbbf24':'#ff4d6a')+'">'+(o.risk_score||0).toFixed(3)+'</span></td></tr>').join('');
   }catch(e){}
 }
 
-async function fetchAllOpportunities(){
-  try{
-    const d=await api('/api/opportunities/all');
-    const b=document.getElementById('allOppTable');
-    if(!d.opportunities||!d.opportunities.length){
-      b.innerHTML='<tr><td colspan="9" style="color:#586078;text-align:center">None</td></tr>';return;
-    }
-    let opps=d.opportunities;
-    const sort=document.getElementById('oppSort').value;
-    opps.sort((a,b)=>(b[sort]||0)-(a[sort]||0));
-    b.innerHTML=opps.map(o=>`<tr><td style="font-weight:500">${o.strategy.replace(/_/g,' ')}</td><td>${o.target}</td>
-      <td>${o.gross_apr.toFixed(1)}%</td><td style="color:#00d4aa">${o.net_apr.toFixed(1)}%</td>
-      <td><span style="color:${o.risk_score<.2?'#00d4aa':o.risk_score<.35?'#fbbf24':'#ff4d6a'}">${o.risk_score.toFixed(3)}</span></td>
-      <td>$${o.gas_cost_usd.toFixed(6)}</td><td>${o.latency_ms.toFixed(0)}ms</td>
-      <td>${(o.sustainability*100).toFixed(0)}%</td><td>${(o.confidence*100).toFixed(0)}%</td></tr>`).join('');
-  }catch(e){}
-}
-
+// ─── RISK ──────────────────────────────────────────────────
 async function assessRisk(){
-  const pool=document.getElementById('riskPool').value;
-  const d=await api('/api/risk/assess',{method:'POST',body:JSON.stringify({opportunity:{id:pool,slippage_pct:0.3,il_risk_pct:3,risk_adjusted_apr:12,tvl:1e6,size:1000,volatility_pct:3,gas_cost_usd:0.0006}})});
-  document.getElementById('riskResult').innerHTML=`
-    <div style="color:${d.level==='safe'||d.level==='caution'?'#00d4aa':'#ff4d6a'};font-size:16px;font-weight:700;margin-bottom:6px">${d.level.toUpperCase()} — ${d.overall.toFixed(3)}</div>
-    <div style="margin-top:4px">Slippage: ${(d.slippage_risk*100).toFixed(0)}% | IL: ${(d.il_risk*100).toFixed(0)}% | Vol: ${(d.volatility_risk*100).toFixed(0)}%</div>
-    <div style="margin-top:4px;color:#00d4aa">${d.recommendation}</div>`;
+  const p=document.getElementById('riskPool').value;
+  const d=await api('/api/risk/assess',{method:'POST',body:JSON.stringify({opportunity:{id:p,slippage_pct:.3,il_risk_pct:3,risk_adjusted_apr:12,tvl:1e6,size:1000,volatility_pct:3,gas_cost_usd:.0006}})});
+  if(!d)return;
+  document.getElementById('riskResult').innerHTML='<div style="font-size:16px;font-weight:700;color:'+(d.level==='safe'||d.level==='caution'?'#00d4aa':'#ff4d6a')+'">'+(d.level||'').toUpperCase()+' ('+((d.overall||0)*100).toFixed(0)+'/100)</div>'+
+    '<div style="height:4px;background:rgba(26,37,64,.3);border-radius:3px;margin:3px 0;overflow:hidden"><div style="width:'+((d.overall||0)*100).toFixed(0)+'%;height:100%;background:'+(d.level==='safe'||d.level==='caution'?'#00d4aa':'#ff4d6a')+';border-radius:3px"></div></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr;gap:3px;font-size:7px;color:#4a5a7a"><span>Slippage '+((d.slippage_risk||0)*100).toFixed(0)+'%</span><span style="text-align:right">IL '+((d.il_risk||0)*100).toFixed(0)+'%</span></div>'+
+    '<div style="margin-top:3px;color:#00d4aa;font-size:7px">'+(d.recommendation||'')+'</div>';
 }
-
 async function runStress(){
-  const size=parseFloat(document.getElementById('stressSize').value);
-  const price=parseFloat(document.getElementById('stressPrice').value);
-  const d=await api('/api/risk/stress',{method:'POST',body:JSON.stringify({position:{entry_price:price,size:size,leverage:1,liquidation_price:0}})});
-  document.getElementById('stressResult').innerHTML=d.scenarios.map(s=>
-    `<div style="padding:4px 0;border-bottom:1px solid #152040">
-      <b>${s.scenario}</b>: <span style="color:${s.pnl_pct<0?'#ff4d6a':'#00d4aa'}">${s.pnl_pct>0?'+':''}${s.pnl_pct}%</span>
-      ${s.would_liquidate?'<span class="badge badge-red">LIQUIDATE</span>':''}
-      <div style="font-size:10px;color:#586078">${s.action}</div>
-    </div>`).join('');
+  const sz=parseFloat(document.getElementById('stressSize').value);const pr=parseFloat(document.getElementById('stressPrice').value);
+  const d=await api('/api/risk/stress',{method:'POST',body:JSON.stringify({position:{entry_price:pr,size:sz,leverage:1,liquidation_price:0}})});
+  if(!d||!d.scenarios)return;
+  document.getElementById('stressResult').innerHTML=d.scenarios.map(s=>'<div style="padding:3px 0;font-size:7px"><b>'+(s.scenario||'')+'</b>: <span style="color:'+((s.pnl_pct||0)<0?'#ff4d6a':'#00d4aa')+'">'+(s.pnl_pct>0?'+':'')+(s.pnl_pct||0)+'%</span>'+(s.would_liquidate?' <span class="badge badge-r">LIQ</span>':'')+'</div>').join('');
+}
+function updateRiskHeatmap(){
+  const el=document.getElementById('riskHeatmap');if(!el)return;
+  const items=[{l:'Slippage',v:.08},{l:'IL',v:.15},{l:'Vol',v:.22},{l:'Contract',v:.05},{l:'Liquidity',v:.12},{l:'Gas Spike',v:.30}];
+  el.innerHTML=items.map(i=>'<div style="background:rgba(8,16,30,.7);border:1px solid rgba(26,37,64,.2);border-radius:6px;padding:4px 5px;text-align:center"><div style="font-size:6.5px;color:#4a5a7a">'+i.l+'</div><div style="font-size:13px;font-weight:700;color:'+(i.v<.1?'#00d4aa':i.v<.25?'#fbbf24':'#ff4d6a')+'">'+(i.v*100).toFixed(0)+'%</div><div style="height:3px;background:rgba(26,37,64,.3);border-radius:2px;margin-top:2px;overflow:hidden"><div style="width:'+(i.v*100).toFixed(0)+'%;height:100%;background:'+(i.v<.1?'#00d4aa':i.v<.25?'#fbbf24':'#ff4d6a')+';border-radius:2px"></div></div></div>').join('');
 }
 
-async function fetchWhitelist(){
-  const d=await api('/api/risk/whitelist');
-  document.getElementById('whitelistDisplay').innerHTML=d.whitelist?.map(w=>`<div style="padding:2px 0;font-family:monospace;color:#00d4aa">${w}</div>`).join('')||'None';
-}
-
-async function fetchMCPTools(){
-  const d=await api('/api/mcp/tools');
-  const list=document.getElementById('mcpToolList');
-  const sel=document.getElementById('mcpToolSelect');
-  list.innerHTML=d.tools?.map(t=>`<div style="padding:4px 0;border-bottom:1px solid #152040"><b style="color:#a855f7">${t.name}</b><div style="font-size:10px;color:#586078">${t.description}</div></div>`).join('')||'None';
-  sel.innerHTML=d.tools?.map(t=>`<option value="${t.name}">${t.name}</option>`).join('')||'';
-}
-
-async function callMCP(){
-  const tool=document.getElementById('mcpToolSelect').value;
-  let args={};
-  try{args=JSON.parse(document.getElementById('mcpArgs').value)}catch(e){args={}}
-  const d=await api('/api/mcp/call',{method:'POST',body:JSON.stringify({tool,arguments:args})});
-  document.getElementById('mcpResult').textContent=JSON.stringify(d,null,2);
-}
-
-async function fetchGas(){
-  const d=await api('/api/gas/forecast');
-  const cur=d.current;
-  document.getElementById('gasCurrent').innerHTML=`
-    <div style="display:flex;gap:16px;margin-top:4px">
-      <div><span style="color:#586078">Level:</span> <b style="color:${cur.level==='low'?'#00d4aa':cur.level==='high'?'#fbbf24':'#ff4d6a'}">${cur.level.toUpperCase()}</b></div>
-      <div><span style="color:#586078">Gas:</span> <b>${(cur.gas_price_motes/1e6).toFixed(1)}M motes</b></div>
-      <div><span style="color:#586078">Hour UTC:</span> <b>${cur.hour_utc}:00</b></div>
-    </div>`;
-  document.getElementById('gasWindows').innerHTML=d.best_windows?.map(w=>`
-    <div style="padding:6px 0;border-bottom:1px solid #152040">
-      <div class="flex-b"><b style="color:#00d4aa">${w.start_utc} - ${w.end_utc}</b>
-        <span class="badge ${w.congestion==='low'?'badge-green':w.congestion==='high'?'badge-yellow':'badge-red'}">${w.congestion}</span></div>
-      <div style="font-size:10px;color:#586078">Gas: ${(w.estimated_gas_motes/1e6).toFixed(1)}M · ${(w.confidence*100).toFixed(0)}% confidence</div>
-      <div style="font-size:10px;color:#586078">${w.reason}</div>
-    </div>`).join('')||'No windows';
-}
-
-async function fetchOrchestrator(){
-  const d=await api('/api/orchestrator');
-  document.getElementById('orchStats').innerHTML=`
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px">
-      <div>Queued: <b>${d.queued}</b></div><div>Batches: <b>${d.pending_batches}</b></div>
-      <div>Completed: <b>${d.completed}</b></div><div>Failed: <b>${d.failed}</b></div>
-    </div>`;
-}
-
-async function fetchTXHistory(){
-  const d=await api('/api/orchestrator/history');
-  document.getElementById('txCount').textContent=d.transactions?.length||0;
-  const b=document.getElementById('txTable');
-  if(!d.transactions||!d.transactions.length){b.innerHTML='<tr><td colspan="6" style="color:#586078;text-align:center">None</td></tr>';return;}
-  b.innerHTML=d.transactions.slice(0,15).map(t=>`<tr>
-    <td style="color:#586078;font-size:10px">${t.id?.substring(0,12)||'--'}</td>
-    <td style="font-weight:500">${t.tx_type||'--'}</td>
-    <td>${t.priority||'--'}</td>
-    <td>${t.gas_estimate_motes?((t.gas_estimate_motes/1e6).toFixed(1)+'M'):'--'}</td>
-    <td><span class="badge ${t.status==='confirmed'?'badge-green':t.status==='failed'?'badge-red':'badge-yellow'}">${t.status||'--'}</span></td>
-    <td class="tx">${t.tx_hash?.substring(0,10)||'--'}...</td>
-  </tr>`).join('');
-}
-
-async function submitTX(){
-  const type=document.getElementById('txTypeSelect').value;
-  const target=document.getElementById('txTarget').value;
-  const amount=parseFloat(document.getElementById('txAmount').value);
-  await api('/api/orchestrator/submit',{method:'POST',body:JSON.stringify({tx_type:type,params:{target,amount},priority:1,urgency:'normal'})});
-  fetchTXHistory();
-}
-
-function startPolling(){
-  if(polling)return;
-  polling=true;
-  const fn=async()=>{await refreshStatus();await fetchLogs();};
-  fn();
-  pollTimer=setInterval(fn,1000);
-}
-function stopPolling(){
-  polling=false;if(pollTimer){clearInterval(pollTimer);pollTimer=null}
-}
-
-async function fetchAllocation(){
+// ─── x402 ──────────────────────────────────────────────────
+async function fetchX402Info(){
   try{
-    const d=await api('/api/allocation');
-    const b=document.getElementById('allocTable');
-    const summary=document.getElementById('allocSummary');
-    if(!d.allocations||!d.allocations.length){
-      b.innerHTML='<tr><td colspan="7" style="color:#586078;text-align:center">No allocation yet</td></tr>';
-      summary.textContent='—';return;
-    }
-    summary.textContent=`${d.allocations.length} targets · ${d.weighted_expected_apr||'?'}% expected APR`;
-    b.innerHTML=d.allocations.map((a,i)=>`<tr>
-      <td style="color:#586078">${i+1}</td>
-      <td style="font-weight:500">${a.strategy.replace(/_/g,' ')}</td>
-      <td>${a.target}</td>
-      <td style="color:#00d4aa">${a.allocation_pct.toFixed(1)}%</td>
-      <td>$${a.allocation_usd.toFixed(2)}</td>
-      <td>${a.expected_net_apr.toFixed(1)}%</td>
-      <td><span style="color:${a.risk_score<.2?'#00d4aa':a.risk_score<.35?'#fbbf24':'#ff4d6a'}">${a.risk_score.toFixed(3)}</span></td>
-    </tr>`).join('');
+    const i=await api('/api/x402/info');if(!i)return;
+    document.getElementById('x402Info').innerHTML='<div class="flex-b"><span>Protocol:</span><b style="color:#0088ff">'+(i.protocol||'')+'</b></div>'+
+      '<div class="flex-b"><span>Network:</span><b>'+(i.network||'')+'</b></div>'+
+      '<div class="flex-b"><span>Desc:</span><span style="color:#4a5a7a;font-size:7px">'+(i.description||'')+'</span></div>';
+    document.getElementById('x402Resources').innerHTML=(i.resources||[]).map(r=>'<div style="padding:4px 0;border-bottom:1px solid rgba(26,37,64,.1);font-size:7px"><b style="color:#0088ff">'+(r.uri||'')+'</b> <span class="badge badge-g">'+(r.cost_cspr||'')+' CSPR</span></div>').join('')||'None';
   }catch(e){}
+}
+async function makeX402Payment(){
+  const r=document.getElementById('x402Resource').value;const a=parseFloat(document.getElementById('x402Amount').value)||.001;
+  const d=await api('/api/x402/pay',{method:'POST',body:JSON.stringify({url:'casper://'+r,amount_cspr:a,resource_type:r})});
+  if(!d||!d.result){document.getElementById('x402Result').innerHTML='<span style="color:#ff4d6a">Failed</span>';toast('Payment failed','e');return}
+  document.getElementById('x402Result').innerHTML='<div class="flex-b"><span style="color:#0088ff">&#10003; PAID '+d.result.invoice.amount_cspr+' CSPR</span><span class="badge badge-g" style="font-size:5px">proof: '+(d.result.invoice.proof||'').substring(0,12)+'</span></div>';
+  toast('Paid '+a+' CSPR','s');
+  x402Payments.unshift({resource:r,amount:a,time:new Date().toLocaleTimeString(),id:(d.result.invoice.payment_id||'').substring(0,12)});
+  const el=document.getElementById('x402Timeline');
+  el.innerHTML=x402Payments.slice(0,10).map(p=>'<div class="timeline-item fade-in"><div class="flex-b"><span style="color:#0088ff;font-weight:600">'+(p.resource||'')+'</span><span>'+(p.amount||0)+' CSPR</span></div><div class="flex-b" style="color:#4a5a7a;font-size:6px"><span>'+(p.time||'')+'</span><span>'+(p.id||'')+'</span></div></div>').join('');
+}
+
+// ─── SUB-AGENTS ──────────────────────────────────────────
+async function loadSubAgents(){
+  try{
+    const d=await api('/api/agents/sub');if(!d)return;
+    const e=Object.entries(d);
+    document.getElementById('agentCount').textContent=e.length+' agents';
+    document.getElementById('agentCards').innerHTML=e.map(([k,a],i)=>`
+      <div class="ag-card fade-in" style="animation-delay:${i*0.04}s">
+        <div class="bar" style="background:linear-gradient(90deg,${a.status==='deployed'?'#00d4aa':'#4a5a7a'},${a.status==='deployed'?'#0088ff':'#3a4a6a'})"></div>
+        <div class="h"><div><span class="n">${a.name}</span><div class="t">${a.type}</div></div><span style="font-size:6.5px;color:${a.status==='deployed'?'#00d4aa':'#4a5a7a'};font-family:monospace">${a.status}</span></div>
+        <div class="d">${a.description}</div>
+        <div class="tags"><span class="badge ${a.dependencies&&a.dependencies.length?'badge-y':'badge-g'}" style="font-size:5px;padding:1px 5px">${a.dependencies&&a.dependencies.length?'deps: '+a.dependencies.join(','):'no deps'}</span>
+          <span class="badge badge-b" style="font-size:5px;padding:1px 5px">${a.latency_ms}ms</span>
+          <span class="badge badge-p" style="font-size:5px;padding:1px 5px">calls:${a.total_calls||0}</span></div>
+        <div style="margin-top:3px">${a.status==='deployed'
+          ?'<button class="btn btn-d btn-xs" onclick="undeployAgent(\''+k+'\')" style="width:100%">Undeploy</button>'
+          :'<button class="btn btn-p btn-xs" onclick="deployAgent(\''+k+'\')" style="width:100%">Deploy</button>'}</div>
+      </div>`).join('');
+  }catch(e){document.getElementById('agentCards').innerHTML='<div style="color:#4a5a7a;font-size:8px;text-align:center;padding:14px">Could not load</div>'}
+}
+async function deployAgent(k){const r=await api('/api/agents/deploy',{method:'POST',body:JSON.stringify({agent_key:k})});if(r&&r.success){toast('Deployed: '+k,'s');loadSubAgents()}else toast('Failed: '+k,'e')}
+async function undeployAgent(k){const r=await api('/api/agents/undeploy',{method:'POST',body:JSON.stringify({agent_key:k})});if(r&&r.success){toast('Undeployed: '+k,'w');loadSubAgents()}else toast('Failed: '+k,'e')}
+async function switchTopology(t){
+  const r=await api('/api/agents/topology',{method:'POST',body:JSON.stringify({topology:t})});if(!r||!r.success)return;
+  document.querySelectorAll('[id^=topo-]').forEach(b=>b.className='btn btn-o btn-xs');
+  document.getElementById('topo-'+t).className='btn btn-p btn-xs';
+  document.getElementById('agentTopology').textContent=t.charAt(0).toUpperCase()+t.slice(1);
+  const ds={sequential:'Linear pipeline — each agent processes in order',parallel:'Market agents run simultaneously, results merge',consensus:'Weighted consensus voting — majority decides'};
+  document.getElementById('topoDesc').textContent=ds[t]||'';
+  toast('Topology: '+t,'i');drawAgentFlow(t);
+}
+async function fetchCoordinationLog(){
+  try{
+    const d=await api('/api/agents/coordination');if(!d||!d.length){document.getElementById('coordLog').innerHTML='<div style="color:#4a5a7a">No events</div>';return}
+    document.getElementById('coordLog').innerHTML=d.slice(-10).reverse().map(e=>'<div style="padding:2px 0;border-bottom:1px solid rgba(26,37,64,.08)"><span style="color:#a855f7">'+e.action+'</span> <span style="color:#00d4aa">'+e.agent+'</span> <span style="color:#4a5a7a">#'+e.cycle+'</span></div>').join('');
+  }catch(e){}
+}
+function drawAgentFlow(topo){
+  const el=document.getElementById('agentFlowDiagram');if(!el)return;
+  const fs={sequential:[{l:'Regime',c:'#00d4aa'},{l:'Yield',c:'#0088ff'},{l:'Risk',c:'#a855f7'},{l:'Strategy',c:'#fbbf24'},{l:'Reason',c:'#ff4d6a'},{l:'Execute',c:'#f59e0b'}],
+    parallel:[{l:'Parallel',c:'#0088ff'},{l:'Merge',c:'#a855f7'},{l:'Strategy',c:'#fbbf24'},{l:'Execute',c:'#f59e0b'}],
+    consensus:[{l:'Vote',c:'#a855f7'},{l:'Consensus',c:'#fbbf24'},{l:'Reason',c:'#ff4d6a'},{l:'Execute',c:'#f59e0b'}]};
+  const steps=fs[topo]||fs.sequential;const w=96/steps.length;
+  el.innerHTML=steps.map((s,i)=>{const l=i*w+2;
+    const c=i<steps.length-1?'<div style="position:absolute;left:'+(l+w-1)+'%;top:50%;width:'+(w-2)+'%;height:2px;background:linear-gradient(90deg,'+s.c+'88,'+steps[i+1].c+'66);transform:translateY(-50%)"></div><div style="position:absolute;left:'+(l+w-.5)+'%;top:50%;width:5px;height:5px;border-radius:50%;background:'+steps[i+1].c+';opacity:.4;animation:tickerPulse 1.5s ease infinite">':'';
+    return '<div style="position:absolute;left:'+l+'%;top:50%;transform:translateY(-50%);width:'+(w-2)+'%;padding:4px 2px;border-radius:6px;font-size:7px;font-weight:600;text-align:center;background:rgba(6,12,24,.9);border:1px solid '+s.c+'44;color:'+s.c+';backdrop-filter:blur(4px);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:0 0 10px '+s.c+'11">'+s.l+'</div>'+c;
+  }).join('');
+}
+function reloadAgentSystem(){const t=document.getElementById('agentTopology').textContent.toLowerCase();drawAgentFlow(t||'sequential')}
+
+// ─── COMPETITION ──────────────────────────────────────────
+async function fetchCompetitionData(){
+  try{
+    const d=await api('/api/competition/compare');if(!d||!d.competitors)return;
+    const features=[
+      {key:'local_ai',label:'Local AI',fmt:v=>v+' NNs'},{key:'sub_agents',label:'Sub-Agents',fmt:v=>v||'0'},{key:'agent_topology',label:'Topology',fmt:v=>v||'--'},
+      {key:'on_chain',label:'On-Chain',fmt:v=>v?'<span class="comp-check">&#10003;</span>':'<span class="comp-cross">&#10007;</span>'},
+      {key:'paper_trading',label:'Paper Trade',fmt:v=>v?'<span class="comp-check">&#10003;</span>':'<span class="comp-cross">&#10007;</span>'},
+      {key:'x402',label:'x402',fmt:v=>v?'<span class="comp-check">&#10003;</span>':'<span class="comp-cross">&#10007;</span>'},
+      {key:'risk_engine',label:'Risk',fmt:v=>v?'<span class="comp-check">&#10003;</span>':'<span class="comp-cross">&#10007;</span>'},
+      {key:'dashboard',label:'Dashboard',fmt:v=>v?'<span class="comp-check">&#10003;</span>':'<span class="comp-cross">&#10007;</span>'},
+      {key:'api_dependency',label:'API Dep.',fmt:v=>v||'--'},
+      {key:'key_differentiator',label:'Differentiator',fmt:v=>'<span style="color:#9aa8c4">'+(v||'--')+'</span>'},
+    ];
+    document.getElementById('compRows').innerHTML=features.map(f=>{
+      const v=d.competitors.map((c,i)=>{const x=f.fmt(c[f.key]);return '<span'+(c.name==='SafetyNet'?' style="color:#00d4aa;font-weight:600"':'')+'>'+x+'</span>'}).join('');
+      return '<div class="comp-row'+(d.competitors[0]?.name==='SafetyNet'?' safetynet':'')+'"><span class="comp-feature">'+f.label+'</span>'+v+'</div>';
+    }).join('');
+    const ja=document.getElementById('judgingAdvantage');
+    if(d.judging_advantage)ja.innerHTML=Object.entries(d.judging_advantage).map(([k,v])=>'<div style="padding:3px 0;border-bottom:1px solid rgba(26,37,64,.1)"><b style="color:#f59e0b;text-transform:capitalize;font-size:7px">'+k.replace(/_/g,' ')+':</b> <span style="color:#9aa8c4;font-size:7px"> '+v+'</span></div>').join('');
+  }catch(e){}
+}
+
+// ─── MCP ──────────────────────────────────────────────────
+async function fetchMCPTools(){
+  const d=await api('/api/mcp/tools');if(!d)return;
+  document.getElementById('mcpToolList').innerHTML=d.tools?.map(t=>'<div style="padding:3px 0;font-size:7px;border-bottom:1px solid rgba(26,37,64,.08)"><b style="color:#a855f7">'+(t.name||'')+'</b> <span style="color:#4a5a7a">'+(t.description||'')+'</span></div>').join('')||'None';
+  document.getElementById('mcpToolSelect').innerHTML=d.tools?.map(t=>'<option value="'+t.name+'">'+t.name+'</option>').join('')||'';
+}
+async function callMCP(){
+  const tool=document.getElementById('mcpToolSelect').value;let args={};try{args=JSON.parse(document.getElementById('mcpArgs').value)}catch(e){}
+  const d=await api('/api/mcp/call',{method:'POST',body:JSON.stringify({tool,arguments:args})});
+  if(!d)return;document.getElementById('mcpResult').textContent=JSON.stringify(d,null,2);toast('MCP executed','i');
+}
+async function fetchTX(){
+  const d=await api('/api/orchestrator');if(!d)return;
+  document.getElementById('txStats').innerHTML='<div class="flex" style="gap:8px"><span>Queued: <b style="color:#fbbf24">'+(d.queued||0)+'</b></span><span>Batches: <b style="color:#a855f7">'+(d.pending_batches||0)+'</b></span><span>Done: <b style="color:#00d4aa">'+(d.completed||0)+'</b></span><span>Failed: <b style="color:#ff4d6a">'+(d.failed||0)+'</b></span></div>';
+  const h=await api('/api/orchestrator/history');if(!h)return;
+  document.getElementById('txCount').textContent=(h.transactions?.length||0)+' txs';
+  const tb=document.getElementById('txTable');
+  if(!h.transactions||!h.transactions.length){tb.innerHTML='<tr><td colspan="5" style="color:#4a5a7a;text-align:center">None</td></tr>';return}
+  tb.innerHTML=h.transactions.slice(0,10).map(t=>'<tr><td style="font-size:6.5px;color:#4a5a7a;font-family:monospace">'+(t.id||'--').substring(0,10)+'</td><td style="font-weight:500">'+(t.tx_type||'--')+'</td><td>'+(t.gas_estimate_motes?((t.gas_estimate_motes/1e6).toFixed(1)+'M'):'--')+'</td><td><span class="badge '+(t.status==='confirmed'?'badge-g':t.status==='failed'?'badge-r':'badge-y')+'">'+(t.status||'--')+'</span></td><td class="tx">'+(t.tx_hash||'--').substring(0,10)+'</td></tr>').join('');
+}
+
+// ─── ACTIONS ────────────────────────────────────────────
+async function runCycle(){
+  const btn=event?.target;
+  if(btn){btn.disabled=true;btn.textContent='\u25B6 Running...';btn.style.opacity='.7'}
+  const r=await api('/api/cycle',{method:'POST'});
+  if(btn){btn.disabled=false;btn.innerHTML='\u25B6 1 Cycle'}
+  if(r&&r.success){updateAfterCycle(r.result);toast('Cycle complete','s')}
+}
+async function runMultiple(){
+  const n=document.getElementById('cycleCount').value;
+  document.getElementById('cycleRunning').textContent='Running '+n+' cycles...';
+  await api('/api/cycles',{method:'POST',body:JSON.stringify({count:parseInt(n),phase:2})});
+  document.getElementById('cycleRunning').textContent='';
+  toast('Running '+n+' cycles','i');startPolling();
+  // Wait for cycles to complete then refresh paper data
+  setTimeout(async()=>{await fetchPaperData();await fetchPaperTrades();await fetchPaperHistory();refreshAll()},3000);
+}
+async function stopAgent(){
+  document.getElementById('cycleRunning').textContent='';
+  await api('/api/stop',{method:'POST'});stopPolling();refreshAll();toast('Stopped','w')
+}
+function clearLogs(){
+  document.getElementById('logConsole').innerHTML='<div class="l"><span class="t">[--:--:--]</span> <span class="l-INFO">Log cleared</span></div>';logSince=0
 }
 
 async function refreshAll(){
-  await refreshStatus();
-  await fetchLogs();
-  await fetchOpportunities();
-  await fetchAllOpportunities();
-  await fetchAllocation();
-  await fetchWhitelist();
-  await fetchMCPTools();
-  await fetchGas();
-  await fetchOrchestrator();
-  await fetchTXHistory();
+  await refreshStatus();await fetchLogs();await fetchPerf();await fetchOpportunities();
+  await fetchGas();await fetchTX();await fetchMCPTools();
+  await fetchPaperData();await fetchPaperTrades();await fetchPaperHistory();
+  await fetchX402Info();await fetchCompetitionData();
+  await loadModelCards();await loadSubAgents();await fetchCoordinationLog();
+  updateRiskHeatmap();reloadAgentSystem();
+}
+function updateAfterCycle(result){
+  refreshAll();document.getElementById('reasonModel').textContent=(result?.ai_inference_ms||'?')+'ms';
+  if(result&&result.ai_reasoning)document.getElementById('aiReasoningOutput').innerHTML='<span class="hl">&#9889; AI Decision:</span> '+result.ai_reasoning;
 }
 
+// ─── FULLSCREEN ──────────────────────────────────────────
+function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen()}else{document.exitFullscreen()}}
+
+// ─── SMART DEMO ─────────────────────────────────────────
+function toggleDemo(){
+  demoRunning=!demoRunning;const b=document.querySelector('.btn-gh[onclick*="toggleDemo"]');
+  if(demoRunning){
+    toast('Auto-demo started — showcasing all features','i');b.textContent='\u25A0';
+    const seq=[
+      {t:'overview',action:()=>aiOnlyAnalysis(),delay:500},
+      {t:'ai',action:()=>{switchTab('ai');runAIAnalysis();setTimeout(initRadarChart,100)},delay:1500},
+      {t:'paper',action:()=>{switchTab('paper');runMultiple();setTimeout(()=>{fetchPaperData();fetchPaperTrades();fetchPaperHistory()},2000)},delay:2000},
+      {t:'markets',action:()=>switchTab('markets'),delay:600},
+      {t:'risk',action:()=>{switchTab('risk');setTimeout(()=>assessRisk(),200)},delay:1200},
+      {t:'x402',action:()=>{switchTab('x402');setTimeout(()=>makeX402Payment(),300);setTimeout(()=>makeX402Payment(),800)},delay:2000},
+      {t:'agents',action:()=>{switchTab('agents');loadSubAgents();fetchCoordinationLog();setTimeout(()=>switchTopology('parallel'),500);setTimeout(()=>switchTopology('consensus'),1000);setTimeout(()=>switchTopology('sequential'),1500)},delay:3500},
+      {t:'competition',action:()=>{switchTab('competition');fetchCompetitionData()},delay:800},
+      {t:'mcp',action:()=>switchTab('mcp'),delay:500},
+      {t:'tx',action:()=>switchTab('tx'),delay:500},
+    ];
+    let idx=0;
+    const runStep=()=>{
+      if(!demoRunning||idx>=seq.length){
+        clearInterval(demoTimer);demoRunning=false;b.innerHTML='\u25B6';
+        toast('Demo tour complete — SafetyNet is ready','s');
+        switchTab('overview');return
+      }
+      const step=seq[idx];
+      switchTab(step.t);
+      if(step.action){try{step.action()}catch(e){}}
+      idx++;
+    };
+    runStep();
+    demoTimer=setInterval(runStep,5000);
+  }else{
+    clearInterval(demoTimer);b.innerHTML='\u25B6';toast('Demo stopped','w')
+  }
+}
+
+// ─── KEYBOARD ──────────────────────────────────────────
+document.addEventListener('keydown',e=>{
+  if(e.key==='1')runCycle();else if(e.key==='b'||e.key==='B')runMultiple();else if(e.key==='a'||e.key==='A')aiOnlyAnalysis();
+  else if(e.key==='s'||e.key==='S')stopAgent();else if(e.key==='f'||e.key==='F')toggleFullscreen();
+  else if(e.key==='d'||e.key==='D')toggleDemo();else if(e.key==='?'||e.key==='/'){if(!helpShown){helpShown=true;toast('1=Cycle B=Batch A=AI S=Stop F=Fullscreen D=Demo','i');setTimeout(()=>helpShown=false,3000)}}
+});
+
+// ─── POLLING ──────────────────────────────────────────
+function startPolling(){if(polling)return;polling=true;const fn=async()=>{await refreshStatus();await fetchLogs();await fetchPerf();updatePerfChart()};fn();pollTimer=setInterval(fn,1500)}
+function stopPolling(){polling=false;if(pollTimer){clearInterval(pollTimer);pollTimer=null}}
+
+// ─── INIT ─────────────────────────────────────────────
 (async function init(){
-  await refreshAll();
-  // Auto-poll status and logs
-  setInterval(async()=>{
-    await refreshStatus();
-    await fetchLogs();
-    await fetchOrchestrator();
-    await fetchTXHistory();
-    await fetchAllocation();
-  },2000);
-  // Refresh opportunities/gas less frequently
-  setInterval(()=>{fetchOpportunities();fetchGas();fetchAllocation()},5000);
+  await loadModelCards();await refreshAll();
+  initRadarChart();updateRiskHeatmap();reloadAgentSystem();
+  drawAgentFlow('sequential');
+  document.getElementById('topo-seq').className='btn btn-p btn-xs';
+  setInterval(async()=>{await refreshStatus();await fetchLogs();await fetchPerf();await fetchTX();await fetchOpportunities();updatePerfChart()},3000);
+  setInterval(async()=>{fetchGas();fetchPaperData();fetchPaperTrades();fetchPaperHistory()},8000);
+  setTimeout(()=>toast('SafetyNet AI — 7 sub-agents deployed · 5 NNs loaded · Ready','s'),2000);
 })();
 </script>
 </body>

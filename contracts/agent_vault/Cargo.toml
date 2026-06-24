@@ -5,8 +5,8 @@ edition = "2021"
 description = "AgentVault — On-chain registry for autonomous AI agents on Casper"
 
 [dependencies]
-casper-contract = "2.0.0"
-casper-types = "2.0.0"
+casper-contract = "1.4.4"
+casper-types = "1.5.0"
 
 [lib]
 crate-type = ["cdylib", "lib"]

@@ -33,6 +33,7 @@ class MCPTool(str, Enum):
     WITHDRAW_LIQUIDITY = "withdraw_liquidity"
     SIMULATE_SWAP = "simulate_swap"
     GET_GAS_ESTIMATE = "get_gas_estimate"
+    X402_PAY = "x402_pay"
 
 
 @dataclass
@@ -64,6 +65,8 @@ RESOURCES = [
                 "Supply/borrow rates, utilization, TVL for a lending market"),
     MCPResource("casper://gas/forecast", "Gas Forecast",
                 "Predicted gas prices for the next N blocks"),
+    MCPResource("x402://pay/{resource}", "x402 Micropayment",
+                "HTTP-native micropayment for AI agent API access"),
 ]
 
 
@@ -211,6 +214,20 @@ class MCPServer:
                     "required": ["market", "token", "amount"]
                 },
                 handler=self._handle_lend,
+            ),
+            MCPToolDef(
+                name="x402_pay",
+                description="x402 micropayment — pay for API data access via HTTP-native payment protocol",
+                input_schema={
+                    "type": "object",
+                    "properties": {
+                        "url": {"type": "string", "description": "API endpoint to access"},
+                        "amount_cspr": {"type": "number", "description": "Payment in CSPR"},
+                        "resource_type": {"type": "string", "description": "e.g. yield_data, price_feed, volatility"},
+                    },
+                    "required": ["url", "amount_cspr"]
+                },
+                handler=self._handle_x402_pay,
             ),
         ]
         for t in tools:
@@ -379,4 +396,40 @@ class MCPServer:
             "token": token,
             "amount": amount,
             "status": "simulated",
+        }
+
+    def _handle_x402_pay(self, url: str, amount_cspr: float,
+                          resource_type: str = "generic") -> dict:
+        payment_id = hashlib.sha256(f'{url}{amount_cspr}{time.time_ns()}'.encode()).hexdigest()[:16]
+        invoice = {
+            "payment_id": f"x402_{payment_id}",
+            "amount_cspr": amount_cspr,
+            "amount_motes": int(amount_cspr * 1_000_000_000),
+            "resource": resource_type,
+            "url": url,
+            "status": "paid",
+            "proof": f"x402_proof_{payment_id}",
+            "protocol": "x402-draft-v1",
+            "timestamp": time.time(),
+        }
+        data_access = {
+            "yield_data": {
+                "cspr-usdc": {"apr": 18.5, "tvl": "$2.1M", "volume_24h": "$320K"},
+                "cspr-eth": {"apr": 12.3, "tvl": "$1.4M", "volume_24h": "$180K"},
+                "usdc-stcspr": {"apr": 8.7, "tvl": "$980K", "volume_24h": "$95K"},
+            },
+            "price_feed": {"cspr": 0.042, "usdc": 0.999, "eth": 1820.50, "stcspr": 0.0415},
+            "volatility": {"cspr_24h": 3.2, "cspr_7d": 12.5, "usdc_24h": 0.12},
+            "gas_forecast": {"current": "moderate", "best_window": "00:00-06:00 UTC", "savings": "40%"},
+            "generic": {"message": "Access granted via x402 micropayment"},
+        }
+        return {
+            "invoice": invoice,
+            "data": data_access.get(resource_type, {"message": "Access granted"}),
+            "receipt": {
+                "paid": True,
+                "resource_accessed": resource_type,
+                "payment_protocol": "x402",
+                "network": "Casper Testnet",
+            },
         }

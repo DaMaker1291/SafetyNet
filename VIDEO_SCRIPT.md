@@ -1,158 +1,212 @@
-# SafetyNet — Demo Video Script
+# SafetyNet — Demo Video Script (Updated)
+**Duration**: ~8 minutes | **Resolution**: 1920×1080 | **Audio**: Clear narration + low background music
 
-**Duration**: ~8 minutes
+---
+
+## 0. Pre-Recording Checklist
+- [ ] `python3 agent/api_server.py` running on localhost:5100
+- [ ] Dashboard open in Chrome fullscreen at http://localhost:5100
+- [ ] Terminal window with `./scripts/deploy_contract.sh init` ready (or use existing hashes)
+- [ ] OBS / QuickTime set to record full screen at 1920×1080
+- [ ] Microphone tested, captions template ready
 
 ---
 
 ## 1. Opening (0:00–0:45)
 
-**[Visual: Logo animation → Dashboard]**
-**[Audio: Upbeat tech background music]**
+**[Visual: Dashboard loading → AI model cards animate in one by one]**
+**[Audio: Upbeat tech background music, fade under narration]**
 
 **Narrator:**
-"Meet SafetyNet — the first autonomous AI agent framework built for the Casper Network. SafetyNet is an agentic AI system that continuously monitors the Casper ecosystem, analyzes market conditions, generates DeFi strategies, and executes them on-chain — all without human intervention.
+"Meet SafetyNet — the first fully autonomous AI agent framework built for the Casper Network. SafetyNet uses five locally-running neural networks to continuously monitor the Casper ecosystem, analyze market conditions, generate DeFi strategies, and record every decision on-chain.
 
-Built for the Casper Buildathon 2025 at the intersection of Agentic AI, Decentralized Finance, and Real-World Assets."
+Built for the Casper Agentic Buildathon 2026 at the intersection of Agentic AI, Decentralized Finance, and Real-World Assets."
 
 ---
 
 ## 2. The Problem (0:45–1:30)
 
-**[Visual: Split screen — left: human trader stressed, right: dashboard showing 24/7 operation]**
+**[Visual: Split screen — left: stressed trader, right: dashboard running smoothly]**
 
-"Narrator:
+**Narrator:**
 "DeFi moves 24/7. Human traders can't watch the markets all the time. Emotional decisions lead to poor outcomes. And once you decide on a strategy, there's no transparent record of why or when it was executed.
 
 SafetyNet solves all of this with an autonomous AI agent that:
-- Never sleeps — 24/7 market monitoring
-- Makes data-driven decisions — no emotions, no bias
-- Records everything on-chain — complete transparency
+- Never sleeps — 24/7 market monitoring across all Casper dApps
+- Makes data-driven decisions — five AI models working together, no emotions
+- Records everything on-chain — complete transparency and auditability
 - Adapts to any market regime — bullish, bearish, or volatile"
 
 ---
 
 ## 3. Architecture Overview (1:30–2:30)
 
-**[Visual: Architecture diagram animating in]**
+**[Visual: Animated architecture diagram — flows from Observer → AI Engine → Risk Engine → Orchestrator → On-Chain]**
 
-"Narrator:
-"SafetyNet has four layers:
+**Narrator:**
+"SafetyNet has five layers, each running on your machine with zero API calls.
 
-First, the **Market Agent** fetches real-time data — CSPR price from CoinGecko, network stats from the Casper node, on-chain transaction volume, and sentiment signals.
+First, the **Observer** polls all Casper data sources — pools, lending markets, volatility, and network congestion.
 
-This feeds into the **Strategy Agent**, which uses AI to classify the market regime and rank five strategy types: Yield Optimization, Liquidity Provision, Arbitrage Detection, Risk Rebalancing, and RWA Collateralization.
+This feeds into the **AI Engine** — five local neural networks working in parallel:
+- MarketRegimeNN classifies the market as Bullish, Bearish, Volatile, or Neutral
+- YieldPredictorNN forecasts APR for each opportunity
+- RiskScorerNN assigns a 0-to-1 risk score
+- StrategySelectorNN picks the best strategy from five options
+- StrategyReasoner generates natural-language explanations
 
-The chosen strategy goes to the **Execution Agent**, which submits it to our **AgentVault smart contract** on Casper Testnet — permanently recording every decision on-chain.
+The chosen strategy goes through the **Risk Engine** — multi-layer guardrails checking slippage, impermanent loss, contract whitelists, and circuit breakers.
 
-All of this is visible in real-time on the **web dashboard**."
+Safe strategies go to the **Transaction Orchestrator** for priority batching and gas-optimized execution.
 
----
+Every decision is recorded on the **AgentVault smart contract** on Casper Testnet.
 
-## 4. Smart Contract Demo (2:30–4:30)
+All of this is visible in real-time on the **dashboard** — which you're looking at right now."
 
-**[Visual: Screen recording — terminal showing contract compilation and deployment]**
-
-"Narrator:
-"Let's look at the on-chain component. AgentVault is a Rust smart contract compiled to Wasm and deployed on Casper Testnet.
-
-Here we're initializing the contract... creating dictionaries for agents, strategies, and actions.
-
-[Type: casper-client put-deploy...]
-
-The contract has eight entry points:
-- `init` — sets up the contract
-- `register_agent` — registers an AI agent with a name and description
-- `submit_strategy` — stores a strategy with its parameters
-- `record_action` — logs every action the agent takes
-- And query functions to read the on-chain state
-
-[Visual: Switching to cspr.live explorer showing the deploy]
-
-Here's the deploy on the Casper Testnet explorer — you can see the transaction is confirmed and the contract is live.
-
-Each strategy and action produces a verifiable on-chain record with timestamps and transaction hashes. This means agent accountability is built into the protocol."
+**[Visual: Mouse hovers over the 5 AI model cards, highlighting each one]**
 
 ---
 
-## 5. AI Agent Demo (4:30–6:30)
+## 4. AI Engine Demo (2:30–4:00)
 
-**[Visual: Terminal running agent_manager.py]**
+**[Visual: Dashboard — AI Engine tab, click "Run Now"]**
 
-"Narrator:
-"Now let's see the AI agent in action. We'll run it for three cycles.
+**Narrator:**
+"Let's see the AI in action. I'll click 'Run Now' to analyze the current market with all four neural networks.
 
-[Type: python agent_manager.py 3]
+**[Click button — results animate in]**
 
-Cycle 1: The Market Agent fetches data — CSPR is at $0.042, sentiment is positive, transaction volume is healthy. The Strategy Agent classifies the market as bullish and recommends Yield Optimization with 92% confidence. The Execution Agent submits this to the smart contract — a transaction hash is generated.
+The MarketRegimeNN classifies the market as BULLISH with 92% confidence. The StrategySelectorNN recommends Yield Optimization at 77%. The RiskScorerNN rates this as SAFE with a score of 0.12. And the YieldPredictor forecasts 14.5% net APR.
 
-[Visual: Dashboard updating with cycle 1 data]
+**[Switch to Overview tab]**
 
-On the dashboard, we can see the CSPR price chart, the active strategies with their confidence scores, and the on-chain transaction history.
+Now let's run a full agent cycle. I'll click '1 Cycle'."
 
-Cycle 2: Market conditions have shifted slightly. The agent detects increased volatility and adjusts — now recommending Arbitrage Detection as the primary strategy. This is recorded on-chain alongside the first strategy.
+**[Click "1 Cycle" — watch the console stream data]**
 
-Cycle 3: The agent runs a full rebalancing — allocating across multiple strategies based on the latest market analysis.
+"The agent polls data, runs all five AI models, evaluates opportunities, checks risk, and generates an allocation plan — all in a few seconds.
 
-The key insight: every decision is explained, every action is recorded on-chain, and the agent adapts in real-time."
-
----
-
-## 6. Dashboard Tour (6:30–7:15)
-
-**[Visual: Full screen dashboard, mouse hovering over elements]**
-
-"Narrator:
-"The dashboard gives you complete visibility into agent operations.
-
-On the top: key metrics — CSPR price, active strategies, total on-chain actions, and agent confidence score.
-
-The market chart shows 24-hour price action with volume overlay.
-
-The strategy portfolio panel shows all five strategy types with their current confidence scores. The agent dynamically adjusts these based on market conditions.
-
-Below: the on-chain activity table shows every transaction the agent has submitted to Casper Testnet, with type, strategy, and transaction hash.
-
-And the agent decision log streams real-time decisions — market snapshots, strategy inferences, and submission confirmations."
+You can see the AI reasoning panel at the top right — the StrategyReasoner explains why this strategy was chosen in natural language."
 
 ---
 
-## 7. Roadmap & Vision (7:15–7:45)
+## 5. Paper Trading Demo (4:00–5:30)
 
-**[Visual: Roadmap graphic with 3 phases]**
+**[Visual: Switch to "Paper Trading" tab]**
 
-"Narrator:
-"This is just the beginning.
+**Narrator:**
+"SafetyNet includes a full paper trading engine with simulated P&L tracking. Let's run five cycles to build up some trading history.
 
-Phase 1 is the Buildathon submission — working smart contract, AI agent, and dashboard.
+**[Click "Batch" with 5 cycles — watch cycles stream in]**
 
-Phase 2: Mainnet deployment, integration with real Casper DeFi protocols like CSPR.fans and CasperSwap, RWA oracle integration, and community voting support.
+After five cycles, we can see the paper trading metrics:
+- **Sharpe ratio** — our risk-adjusted return
+- **Max drawdown** — our largest peak-to-trough decline
+- **Win rate** and **win streak** — how consistently we profit
 
-Phase 3: Reinforcement learning for self-optimizing strategies, decentralized governance via DAO, and an open marketplace where anyone can deploy their own SafetyNet agent.
+**[Point to Equity Curve chart]**
 
-We're building the autonomous agent layer for the Casper ecosystem."
+The equity curve shows our capital growing over time. The green line is cumulative P&L, the purple dashed line is total capital.
+
+**[Point to Daily Returns bar chart]**
+
+The bar chart shows each cycle's return — green bars are profitable, red bars are losses.
+
+**[Point to Trade History table]**
+
+The trade history table shows every simulated trade with allocation amounts, return percentages, and P&L in dollars."
 
 ---
 
-## 8. Call to Action (7:45–8:00)
+## 6. On-Chain Contract Demo (5:30–6:45)
 
-**[Visual: Logo + links]**
+**[Visual: Terminal window, deployment in progress]**
 
-"Narrator:
-"Check out our GitHub repo for the full source code. Vote for us on CSPR.fans. Join our Discord to be part of the journey.
+**Narrator:**
+"SafetyNet has an on-chain component — the AgentVault session contract deployed on Casper Testnet. Every agent registration and strategy submission is recorded as a permanent on-chain transaction.
 
-SafetyNet — Autonomous AI for the Casper Network.
+**[Show deploy_contract.sh running]**
 
-Thank you."
+We run `./scripts/deploy_contract.sh init` to initialize on-chain storage — creating dictionary seeds and counters..."
 
-**[Visual: Fade to black with "SafetyNet" logo and "Built for Casper Buildathon 2025"]**
+**[Show register_agent command]**
+
+"Then `./scripts/deploy_contract.sh register_agent` to register an agent on-chain. Each transaction is submitted via CSPR.cloud's RPC proxy with authentication.
+
+**[Show transaction hashes]**
+
+Here's the proof: the init transaction `f2247779` cost 0.719 CSPR and succeeded. The register_agent transaction `d69620dd` cost 0.220 CSPR and stored the SafetyNet agent on-chain.
+
+This means every AI agent action can be independently verified on the Casper blockchain."
+
+**[Show Competition tab]**
+
+---
+
+## 7. Competition Comparison (6:45–7:30)
+
+**[Visual: Switch to "🏆 Competition" tab]**
+
+**Narrator:**
+"Here's where SafetyNet really stands out. The Competition tab compares SafetyNet against every other BUIDL in the Casper Agentic Buildathon.
+
+SafetyNet is the only entry with:
+- **5 local AI models** — everyone else uses Claude/GPT API calls
+- **A deployed on-chain contract** — verified on Casper Testnet
+- **Paper trading with advanced metrics** — Sharpe ratio, drawdown, win streaks
+- **A professional trading terminal dashboard** — AI radar chart, live ticker, 9 feature tabs
+- **A multi-layer risk engine** — slippage, IL, whitelist, circuit breakers
+
+**[Scroll through the comparison table]**
+
+The judging advantage section breaks down exactly why SafetyNet excels across all seven judging criteria: Technical Execution, Innovation, AI Usage, Real-World Applicability, UX Design, Smart Contracts, and Launch Plans."
+
+---
+
+## 8. x402 Micropayments (7:30–8:00)
+
+**[Visual: Switch to x402 tab]**
+
+**Narrator:**
+"SafetyNet also implements the x402 HTTP-native micropayment protocol, allowing AI agents to pay for data access autonomously.
+
+**[Select a resource, click Pay]**
+
+I'll pay 0.001 CSPR for real-time yield data. The payment is processed instantly, and the data is returned.
+
+**[Show payment timeline]**
+
+The payment history timeline on the right shows all x402 transactions — creating a verifiable record of agent spending.
+
+This positions SafetyNet at the cutting edge of autonomous machine-to-machine commerce on Casper."
+
+---
+
+## 9. Roadmap & Call to Action (8:00–8:30)
+
+**[Visual: Switch to GitHub repo in browser]**
+
+**Narrator:**
+"SafetyNet is just getting started. Phase 1 — the Buildathon submission — is complete with a working dashboard, five local AI models, paper trading, x402 payments, and a deployed on-chain contract.
+
+Phase 2 brings mainnet deployment, real Casper DeFi protocol integration, and RWA oracle connectivity.
+
+Phase 3 adds reinforcement learning, DAO governance, and a marketplace for autonomous agent strategies.
+
+All code is open-source on GitHub. Check out the repository, watch the code walkthrough, and see why SafetyNet is the most technically complete submission in this hackathon.
+
+SafetyNet — Autonomous AI for the Casper Network. Thank you."
+
+**[Visual: Fade to SafetyNet logo with "Built for Casper Agentic Buildathon 2026" and GitHub link]**
 
 ---
 
 ## Production Notes
 
-- **Screen resolution**: Record at 1920×1080
-- **Terminal font**: Use a monospace font with dark theme (e.g., iTerm2 + Dracula)
-- **Dashboard**: Open `frontend/index.html` in Chrome in fullscreen
-- **Audio**: Clear narration + low background music (fade during narration)
-- **Captions**: Add English subtitles
-- **Thumbnail**: SafetyNet logo on dark background with "AI Agent for Casper DeFi"
+- **Screen recording**: Use OBS Studio or QuickTime Player at 1920×1080
+- **Terminal**: iTerm2 with Dracula theme, font size 11pt
+- **Dashboard**: Chrome in fullscreen (Cmd+Shift+F) at http://localhost:5100
+- **Audio**: Clear narration + low background music (fade during narration, boost at title card)
+- **Captions**: Add English subtitles throughout
+- **Thumbnail**: SafetyNet logo on dark background + "5 Local AI Models · Casper DeFi"
+- **Submission**: Upload to YouTube (unlisted), paste link in DoraHacks submission form

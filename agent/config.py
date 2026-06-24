@@ -26,10 +26,6 @@ AGENT_SECRET_KEY_PATH = os.getenv(
 )
 AGENT_PUBLIC_KEY_HEX = os.getenv("AGENT_PUBLIC_KEY_HEX", "")
 
-# AI / ML
-AI_MODEL = os.getenv("AI_MODEL", "gpt-4")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-
 # Agent behaviour
 AGENT_NAME = os.getenv("AGENT_NAME", "SafetyNet Alpha v1")
 AGENT_DESCRIPTION = os.getenv("AGENT_DESCRIPTION",
