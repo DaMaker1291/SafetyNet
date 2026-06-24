@@ -304,6 +304,7 @@ kbd{display:inline-block;padding:1px 5px;border-radius:4px;font-size:6.5px;font-
     <div><h1>SafetyNet AI</h1><small>7 Sub-Agents · 5 NNs · 0 API Calls · On-Chain</small></div>
   </div>
   <div class="h-right">
+    <span class="badge" style="background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(168,85,247,.12));border:1px solid rgba(0,212,170,.25);color:#00d4aa;font-size:6.5px;padding:2px 8px;letter-spacing:.3px;box-shadow:0 0 10px rgba(0,212,170,.08)" id="sovereignBadge">&#9889; Sovereign AI: 0% Cloud APIs · 100% Local CPU</span>
     <span class="badge badge-gold" id="compBadge">&#9733; Innovation Track</span>
     <input type="number" id="portInput" value="5100" style="width:40px" placeholder="Port">
     <button class="btn btn-o btn-xs" onclick="updatePort()">Connect</button>
@@ -382,6 +383,20 @@ kbd{display:inline-block;padding:1px 5px;border-radius:4px;font-size:6.5px;font-
       <div class="console" id="logConsole"><div class="l"><span class="t">[--:--:--]</span> <span class="l-INFO">7 sub-agents deployed · 5 NNs loaded</span></div></div></div>
     <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">AI Reasoning</span><span style="color:#a855f7;font-size:7px" id="reasonModel">--</span></div>
       <div class="ai-box" id="aiReasoningOutput"><span style="color:#4a5a7a">&#9654; Run a cycle or <span style="color:#a855f7">AI Only</span> to see AI reasoning</span></div></div>
+  </div>
+  <div class="g-2" style="margin-bottom:6px">
+    <div class="card" style="background:rgba(0,212,170,.04);border-color:rgba(0,212,170,.15)">
+      <div class="flex-b"><span style="font-size:8px;font-weight:600;color:#00d4aa">&#128274; Casper Session-Only Security</span></div>
+      <div style="font-size:7px;color:#9aa8c4;line-height:1.5;margin-top:2px">
+        On Ethereum, giving an AI agent control means risking your <b style="color:#e4eaf2">whole wallet</b>. On Casper, SafetyNet's <b style="color:#00d4aa">session-only AgentVault</b> lets the agent sign yield-routing actions <b style="color:#e4eaf2">without custody</b> of the user's main account. Autonomous trading that's actually <b style="color:#00d4aa">safe</b>.
+      </div>
+    </div>
+    <div class="card" style="background:rgba(168,85,247,.04);border-color:rgba(168,85,247,.15)">
+      <div class="flex-b"><span style="font-size:8px;font-weight:600;color:#a855f7">&#128640; MCP Server — Gift to Casper Ecosystem</span></div>
+      <div style="font-size:7px;color:#9aa8c4;line-height:1.5;margin-top:2px">
+        SafetyNet ships a <b style="color:#a855f7">12-tool MCP Server</b> so <b style="color:#e4eaf2">any</b> future AI developer on Casper can use our infrastructure. Read balances, query pools, check volatility, estimate gas, execute x402 payments — all through a standard protocol. <b style="color:#a855f7">Open source, ready to use.</b>
+      </div>
+    </div>
   </div>
   <div class="card"><div class="flex-b"><span style="font-size:9px;font-weight:600">Allocation Plan</span><span style="color:#4a5a7a;font-size:7px" id="allocSummary">&mdash;</span></div>
     <div class="scroll"><table><thead><tr><th>#</th><th>Strategy</th><th>Target</th><th>Alloc %</th><th>USD</th><th>APR</th><th>Risk</th></tr></thead>
@@ -1136,7 +1151,8 @@ function stopPolling(){polling=false;if(pollTimer){clearInterval(pollTimer);poll
   document.getElementById('topo-seq').className='btn btn-p btn-xs';
   setInterval(async()=>{await refreshStatus();await fetchLogs();await fetchPerf();await fetchTX();await fetchOpportunities();updatePerfChart()},3000);
   setInterval(async()=>{fetchGas();fetchPaperData();fetchPaperTrades();fetchPaperHistory()},8000);
-  setTimeout(()=>toast('SafetyNet AI — 7 sub-agents deployed · 5 NNs loaded · Ready','s'),2000);
+  setTimeout(()=>{toast('SafetyNet AI — 7 sub-agents deployed · 5 NNs loaded · Ready','s')},2000);
+  setTimeout(()=>{if(!demoRunning)toggleDemo()},4500);
 })();
 </script>
 </body>
