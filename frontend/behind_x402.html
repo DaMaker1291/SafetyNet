@@ -1,0 +1,47 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#02050e;color:#e4eaf2;font-family:'SF Mono','Fira Code',monospace;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.container{width:1600px;padding:40px}
+.title{font-size:14px;color:#4a5a7a;text-transform:uppercase;letter-spacing:6px;margin-bottom:30px;text-align:center}
+.heading{font-size:42px;font-weight:800;background:linear-gradient(135deg,#0088ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:40px}
+.flow{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:40px}
+.step{width:260px;padding:20px;border-radius:12px;border:1px solid rgba(26,37,64,.3);background:rgba(4,9,20,.7);text-align:center}
+.step .num{font-size:36px;font-weight:800;color:#0088ff;margin-bottom:8px}
+.step .name{font-size:14px;font-weight:600;color:#c8d0dc;margin-bottom:6px}
+.step .desc{font-size:10px;color:#586078;line-height:1.4}
+.arrow{font-size:24px;color:#0088ff}
+.logs{background:rgba(1,3,8,.9);border:1px solid rgba(26,37,64,.3);border-radius:12px;padding:20px;font-size:11px;line-height:1.8}
+.log-line{padding:4px 0;border-bottom:1px solid rgba(26,37,64,.1)}
+.log-time{color:#4a5a7a;margin-right:12px}
+.log-action{color:#0088ff;font-weight:600}
+.log-ok{color:#00d4aa}
+.log-hash{color:#a855f7}
+.btm{display:flex;justify-content:space-between;margin-top:30px;font-size:11px;color:#3a4a6a}
+.btm .hl{color:#0088ff;font-weight:600}
+</style></head><body>
+<div class="container">
+  <div class="title">x402 Micropayments</div>
+  <div class="heading">Agent Pays for Data Per-Request on Casper</div>
+  <div class="flow">
+    <div class="step"><div class="num">1</div><div class="name">Request</div><div class="desc">Agent needs yield data from a provider</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="num">2</div><div class="name">Invoice</div><div class="desc">Provider issues x402 invoice for 0.001 CSPR</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="num">3</div><div class="name">Pay</div><div class="desc">Agent pays via session-only AgentVault</div></div>
+    <div class="arrow">→</div>
+    <div class="step"><div class="num">4</div><div class="name">Access</div><div class="desc">Data delivered, proof stored on-chain</div></div>
+  </div>
+  <div class="logs">
+    <div class="log-line"><span class="log-time">17:42:03</span> <span class="log-action">x402.pay</span> yield_data <span class="log-ok">✓ paid 0.001 CSPR</span> <span class="log-hash">proof: f2247779c405</span></div>
+    <div class="log-line"><span class="log-time">17:42:03</span> <span class="log-action">x402.pay</span> price_feed <span class="log-ok">✓ paid 0.001 CSPR</span> <span class="log-hash">proof: d69620dd2610</span></div>
+    <div class="log-line"><span class="log-time">17:42:04</span> <span class="log-action">x402.pay</span> volatility <span class="log-ok">✓ paid 0.001 CSPR</span> <span class="log-hash">proof: a3b8c1d5e6f7</span></div>
+    <div class="log-line"><span class="log-time">17:42:04</span> <span class="log-action">x402.pay</span> gas_forecast <span class="log-ok">✓ paid 0.001 CSPR</span> <span class="log-hash">proof: 9f8e7d6c5b4a</span></div>
+  </div>
+  <div class="btm">
+    <span><span class="hl">Protocol:</span> HTTP 402 + Casper transfers</span>
+    <span><span class="hl">Session-only:</span> No custody risk</span>
+    <span><span class="hl">Cost per cycle:</span> 0.004 CSPR</span>
+    <span><span class="hl">Proof:</span> On-chain transfer hashes</span>
+  </div>
+</div>
+</body></html>

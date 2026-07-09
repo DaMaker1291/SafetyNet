@@ -1,0 +1,43 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#02050e;color:#e4eaf2;font-family:'SF Mono','Fira Code',monospace;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.container{width:1600px;padding:40px}
+.title{font-size:14px;color:#4a5a7a;text-transform:uppercase;letter-spacing:6px;margin-bottom:30px;text-align:center}
+.heading{font-size:42px;font-weight:800;background:linear-gradient(135deg,#00d4aa,#0088ff,#a855f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:50px}
+.pipeline{display:flex;align-items:center;justify-content:center;gap:0}
+.node{display:flex;flex-direction:column;align-items:center;gap:8px}
+.dot{width:80px;height:80px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;color:#fff;border:2px solid}
+.label{font-size:12px;color:#586078;max-width:100px;text-align:center}
+.connector{width:120px;height:3px;margin:0 10px;position:relative;transform:translateY(-40px)}
+.connector::after{content:'';position:absolute;right:-6px;top:-4px;width:10px;height:10px;border-radius:50%}
+.flow{position:absolute;top:-8px;left:0;width:12px;height:12px;border-radius:50%;animation:flow 2s linear infinite}
+@keyframes flow{0%{left:0;opacity:0}20%{opacity:1}80%{opacity:1}100%{left:calc(100% - 12px);opacity:0}}
+.btm{display:flex;justify-content:space-between;margin-top:50px;font-size:11px;color:#3a4a6a}
+.btm .hl{color:#00d4aa;font-weight:600}
+</style></head><body>
+<div class="container">
+  <div class="title">Agent Pipeline</div>
+  <div class="heading">Data Flow Between 7 Sub-Agents</div>
+  <div class="pipeline">
+    <div class="node"><div class="dot" style="border-color:#00d4aa;background:rgba(0,212,170,.1)">R</div><div class="label">Market Regime</div></div>
+    <div class="connector" style="background:linear-gradient(90deg,#00d4aa,#0088ff)"><div class="flow" style="background:#00d4aa"></div></div>
+    <div class="node"><div class="dot" style="border-color:#0088ff;background:rgba(0,136,255,.1)">Y</div><div class="label">Yield Predictor</div></div>
+    <div class="connector" style="background:linear-gradient(90deg,#0088ff,#a855f7)"><div class="flow" style="background:#0088ff;animation-delay:.3s"></div></div>
+    <div class="node"><div class="dot" style="border-color:#a855f7;background:rgba(168,85,247,.1)">Rx</div><div class="label">Risk Scorer</div></div>
+    <div class="connector" style="background:linear-gradient(90deg,#a855f7,#fbbf24)"><div class="flow" style="background:#a855f7;animation-delay:.6s"></div></div>
+    <div class="node"><div class="dot" style="border-color:#fbbf24;background:rgba(251,191,36,.1)">S</div><div class="label">Strategy Selector</div></div>
+    <div class="connector" style="background:linear-gradient(90deg,#fbbf24,#ff4d6a)"><div class="flow" style="background:#fbbf24;animation-delay:.9s"></div></div>
+    <div class="node"><div class="dot" style="border-color:#ff4d6a;background:rgba(255,77,106,.1)">Re</div><div class="label">Reasoner</div></div>
+    <div class="connector" style="background:linear-gradient(90deg,#ff4d6a,#f59e0b)"><div class="flow" style="background:#ff4d6a;animation-delay:1.2s"></div></div>
+    <div class="node"><div class="dot" style="border-color:#f59e0b;background:rgba(245,158,11,.1)">E</div><div class="label">Execution</div></div>
+    <div class="connector" style="background:linear-gradient(90deg,#f59e0b,#00d4aa)"><div class="flow" style="background:#f59e0b;animation-delay:1.5s"></div></div>
+    <div class="node"><div class="dot" style="border-color:#00d4aa;background:rgba(0,212,170,.1)">G</div><div class="label">Guardian</div></div>
+  </div>
+  <div class="btm">
+    <span><span class="hl">Topologies:</span> Sequential | Parallel | Consensus</span>
+    <span><span class="hl">Coordination:</span> Real-time logging</span>
+    <span><span class="hl">Dependency tracking:</span> Yes</span>
+    <span><span class="hl">Deploy/undeploy:</span> Independent</span>
+  </div>
+</div>
+</body></html>

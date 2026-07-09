@@ -1,0 +1,100 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0c0c0c;color:#e0e0e0;font-family:'SF Mono','Menlo','Monaco','Courier New',monospace;width:1920px;height:1080px;overflow:hidden;padding:20px}
+.terminal{background:#0c0c0c;border:1px solid #333;border-radius:8px;width:100%;height:100%;padding:16px;overflow:hidden}
+.titlebar{display:flex;align-items:center;gap:8px;padding-bottom:12px;border-bottom:1px solid #222;margin-bottom:12px}
+.dot{width:12px;height:12px;border-radius:50%}.r{background:#ff5f56}.y{background:#ffbd2e}.g{background:#27c93f}
+.titlebar span{color:#666;font-size:11px;margin-left:12px}
+.line{font-size:14px;line-height:2;white-space:pre;opacity:0}
+.line .prompt{color:#27c93f}
+.line .cmd{color:#fff;font-weight:700}
+.line .url{color:#58a6ff}
+.line .json{color:#a855f7}
+.line .key{color:#58a6ff}
+.line .val{color:#27c93f}
+.line .num{color:#f59e0b}
+.line .dim{color:#555}
+.line .err{color:#f85149}
+.line .ok{color:#27c93f}
+.line .header{color:#f59e0b}
+.line .arrow{color:#666}
+</style></head><body>
+<div class="terminal">
+<div class="titlebar"><div class="r"></div><div class="y"></div><div class="g"></div><span>safetynet@casper — SafetyNet v2.2.1</span></div>
+<div id="output"></div>
+</div>
+<script>
+const lines=[
+  {text:'<span class="prompt">▶</span> <span class="cmd">python3 agent/api_server.py</span>',delay:0},
+  {text:'<span class="dim">[INFO]</span> Training MarketRegimeNN on 2000 samples...',delay:200},
+  {text:'<span class="dim">[INFO]</span> Training YieldPredictorNN on 2000 samples...',delay:400},
+  {text:'<span class="dim">[INFO]</span> Training RiskScorerNN on 2000 samples...',delay:600},
+  {text:'<span class="dim">[INFO]</span> Training StrategySelectorNN on 2000 samples...',delay:800},
+  {text:'<span class="ok">[OK]</span> <span class="val">All 5 neural networks trained in 12.3s</span>',delay:1000},
+  {text:'<span class="ok">[OK]</span> SafetyNet server running on <span class="url">http://localhost:5100</span>',delay:1200},
+  {text:'',delay:1500},
+  {text:'<span class="prompt">▶</span> <span class="cmd">curl -s http://localhost:5100/api/status | python3 -m json.tool</span>',delay:1800},
+  {text:'<span class="json">{</span>',delay:2200},
+  {text:'<span class="json">  </span><span class="key">"agent"</span>: <span class="val">"SafetyNet v2.2.1"</span>,',delay:2300},
+  {text:'<span class="json">  </span><span class="key">"phase"</span>: <span class="val">"P2_PAPER_TRADING"</span>,',delay:2400},
+  {text:'<span class="json">  </span><span class="key">"ai_models"</span>: <span class="num">5</span>,',delay:2500},
+  {text:'<span class="json">  </span><span class="key">"sub_agents"</span>: <span class="num">7</span>,',delay:2600},
+  {text:'<span class="json">  </span><span class="key">"inference_time_ms"</span>: <span class="num">3.7</span>,',delay:2700},
+  {text:'<span class="json">  </span><span class="key">"uptime_hours"</span>: <span class="num">0.42</span>',delay:2800},
+  {text:'<span class="json">}</span>',delay:2900},
+  {text:'',delay:3200},
+  {text:'<span class="prompt">▶</span> <span class="cmd">curl -s -X POST http://localhost:5100/api/ai/analyze</span>',delay:3500},
+  {text:'<span class="prompt">▶</span> <span class="cmd">  -H "Content-Type: application/json"</span>',delay:3700},
+  {text:'<span class="prompt">▶</span> <span class="cmd">  -d \'{"market":"cspr_usdt","amount":1000}\'</span>',delay:3900},
+  {text:'',delay:4200},
+  {text:'<span class="json">{</span>',delay:4500},
+  {text:'<span class="json">  </span><span class="key">"regime"</span>: <span class="val">"STABLE_BULL"</span>, <span class="dim">// MarketRegimeNN: 87.3% confidence</span>',delay:4700},
+  {text:'<span class="json">  </span><span class="key">"predicted_apr"</span>: <span class="num">14.2</span>, <span class="dim">// YieldPredictorNN: R²=0.94</span>',delay:4900},
+  {text:'<span class="json">  </span><span class="key">"risk_score"</span>: <span class="num">0.23</span>, <span class="dim">// RiskScorerNN: LOW risk</span>',delay:5100},
+  {text:'<span class="json">  </span><span class="key">"strategy"</span>: <span class="val">"BALANCED_YIELD"</span>, <span class="dim">// StrategySelectorNN: 91.2%</span>',delay:5300},
+  {text:'<span class="json">  </span><span class="key">"reasoning"</span>: <span class="val">"Stable bull regime detected. Moderate allocation to LP pools with</span>',delay:5500},
+  {text:'<span class="json">  </span><span class="val">    impermanent loss protection. Projected 14.2% APR with risk 0.23/1.0."</span>',delay:5700},
+  {text:'<span class="json">}</span>',delay:5900},
+  {text:'',delay:6200},
+  {text:'<span class="prompt">▶</span> <span class="cmd">curl -s -X POST http://localhost:5100/api/subagents/deploy</span>',delay:6500},
+  {text:'<span class="prompt">▶</span> <span class="cmd">  -d \'{"agent_id":"market_regime_nn"}\'</span>',delay:6700},
+  {text:'<span class="ok">[DEPLOY]</span> MarketRegimeNN <span class="val">DEPLOYED</span> ✓  <span class="dim">status=active | last_inference=12ms</span>',delay:7000},
+  {text:'<span class="ok">[DEPLOY]</span> YieldPredictorNN <span class="val">DEPLOYED</span> ✓  <span class="dim">status=active | last_inference=8ms</span>',delay:7200},
+  {text:'<span class="ok">[DEPLOY]</span> RiskScorerNN <span class="val">DEPLOYED</span> ✓  <span class="dim">status=active | last_inference=6ms</span>',delay:7400},
+  {text:'<span class="ok">[DEPLOY]</span> StrategySelectorNN <span class="val">DEPLOYED</span> ✓  <span class="dim">status=active | last_inference=9ms</span>',delay:7600},
+  {text:'<span class="ok">[DEPLOY]</span> ExecutionAgent <span class="val">DEPLOYED</span> ✓  <span class="dim">status=active | mode=PAPER</span>',delay:7800},
+  {text:'<span class="ok">[DEPLOY]</span> RiskGuardian <span class="val">DEPLOYED</span> ✓  <span class="dim">status=active | circuit_breaker=OFF</span>',delay:8000},
+  {text:'<span class="ok">[DEPLOY]</span> Observer <span class="val">DEPLOYED</span> ✓  <span class="dim">status=active | logging=ALL</span>',delay:8200},
+  {text:'',delay:8500},
+  {text:'<span class="prompt">▶</span> <span class="cmd">curl -s http://localhost:5100/api/risk/check</span>',delay:8800},
+  {text:'<span class="json">{</span>',delay:9100},
+  {text:'<span class="json">  </span><span class="key">"max_drawdown"</span>: <span class="num">2.1</span>, <span class="dim">// vs 15% threshold</span>',delay:9300},
+  {text:'<span class="json">  </span><span class="key">"daily_loss"</span>: <span class="num">0.3</span>, <span class="dim">// vs 5% threshold</span>',delay:9500},
+  {text:'<span class="json">  </span><span class="key">"circuit_breaker"</span>: <span class="val">"OFF"</span>, <span class="dim">// all clear</span>',delay:9700},
+  {text:'<span class="json">  </span><span class="key">"position_size_ok"</span>: <span class="ok">true</span>,',delay:9900},
+  {text:'<span class="json">  </span><span class="key">"slippage_ok"</span>: <span class="ok">true</span>,',delay:10100},
+  {text:'<span class="json">  </span><span class="key">"gas_forecast"</span>: <span class="num">0.05</span> <span class="val">CSPR</span>',delay:10300},
+  {text:'<span class="json">}</span>',delay:10500},
+  {text:'',delay:10800},
+  {text:'<span class="prompt">▶</span> <span class="cmd">curl -s http://localhost:5100/api/strategy/rebalance</span>',delay:11100},
+  {text:'<span class="ok">[EXEC]</span> <span class="val">PAPER TRADE</span> — Rebalanced portfolio:',delay:11400},
+  {text:'<span class="dim">  →</span> CSPR/USDT LP: 40% <span class="ok">(+2.1% today)</span>',delay:11600},
+  {text:'<span class="dim">  →</span> CSPR Staking: 35% <span class="ok">(+0.8% today)</span>',delay:11800},
+  {text:'<span class="dim">  →</span> Stable Yield: 25% <span class="ok">(+0.3% today)</span>',delay:12000},
+  {text:'<span class="ok">[LOG]</span> Sharpe Ratio: <span class="num">2.41</span> | Max Drawdown: <span class="num">2.1%</span> | Win Rate: <span class="num">68%</span>',delay:12200},
+  {text:'<span class="ok">[LOG]</span> Total P&L: <span class="val">+$127.43</span> | Best Strategy: <span class="val">CSPR/USDT LP</span>',delay:12400},
+  {text:'',delay:12700},
+  {text:'<span class="dim">────────────────────────────────────────────────────────────</span>',delay:13000},
+  {text:'<span class="ok">✓</span> <span class="val">All systems operational. 5 NNs + 7 sub-agents active.</span>',delay:13200},
+  {text:'<span class="ok">✓</span> <span class="dim">Zero cloud APIs · 100% local CPU · 3.7ms inference</span>',delay:13400},
+  {text:'<span class="ok">✓</span> <span class="dim">Paper trading mode — no real funds at risk</span>',delay:13600},
+];
+const output=document.getElementById('output');
+lines.forEach((l,i)=>{
+  const div=document.createElement('div');
+  div.className='line';
+  div.innerHTML=l.text||'&nbsp;';
+  setTimeout(()=>{div.style.opacity='1'},l.delay);
+  output.appendChild(div);
+});
+</script></body></html>

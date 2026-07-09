@@ -99,6 +99,12 @@ body::after{content:'';position:fixed;top:0;left:0;right:0;bottom:0;
 .badge-b{background:rgba(0,136,255,.1);color:#0088ff;border:1px solid rgba(0,136,255,.2)}
 .badge-gold{background:rgba(245,158,11,.1);color:#f59e0b;border:1px solid rgba(245,158,11,.2);animation:glowPulse 2s ease infinite alternate}
 @keyframes glowPulse{from{box-shadow:0 0 4px rgba(245,158,11,0)}to{box-shadow:0 0 12px rgba(245,158,11,.15)}}
+.countdown{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:6px;font-size:6.5px;font-weight:600;background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.15);color:#fbbf24;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rec-dot{display:none;width:6px;height:6px;border-radius:50%;background:#ff4d6a;animation:recPulse .8s ease infinite;margin-right:4px}
+.rec-dot.active{display:inline-block}
+@keyframes recPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.7)}}
+.demo-step{display:none;font-size:6px;color:#4a5a7a;background:rgba(26,37,64,.2);padding:1px 6px;border-radius:4px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.demo-step.active{display:inline-block}
 
 /* ─── METRIC ROW ─── */
 .metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:7px}
@@ -306,10 +312,13 @@ kbd{display:inline-block;padding:1px 5px;border-radius:4px;font-size:6.5px;font-
   <div class="h-right">
     <span class="badge" style="background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(168,85,247,.12));border:1px solid rgba(0,212,170,.25);color:#00d4aa;font-size:6.5px;padding:2px 8px;letter-spacing:.3px;box-shadow:0 0 10px rgba(0,212,170,.08)" id="sovereignBadge">&#9889; Sovereign AI: 0% Cloud APIs · 100% Local CPU</span>
     <span class="badge badge-gold" id="compBadge">&#9733; Innovation Track</span>
+    <span class="countdown" id="countdownTimer">&#9201; 7d 0h</span>
     <input type="number" id="portInput" value="5100" style="width:40px" placeholder="Port">
     <button class="btn btn-o btn-xs" onclick="updatePort()">Connect</button>
     <button class="btn btn-gh btn-xs" onclick="toggleFullscreen()" title="Fullscreen">&#9974;</button>
     <button class="btn btn-gh btn-xs" onclick="toggleDemo()" title="Auto-Demo">&#9654;</button>
+    <span class="rec-dot" id="recDot"></span>
+    <span class="demo-step" id="demoStep"></span>
     <span class="badge badge-g" id="statusBadge">&#9679; Idle</span>
     <span style="color:#4a5a7a;font-size:7px" id="phaseLabel">P2 — Paper</span>
   </div>
@@ -534,6 +543,12 @@ kbd{display:inline-block;padding:1px 5px;border-radius:4px;font-size:6.5px;font-
   <div class="g-2">
     <div class="card" style="grid-column:span 2;background:rgba(245,158,11,.03);border-color:rgba(245,158,11,.12)">
       <div class="flex-b" style="margin-bottom:5px"><span style="font-size:11px;font-weight:700;color:#f59e0b">&#127942; Casper Agentic Buildathon 2026</span><span class="badge badge-gold">SafetyNet Leading</span></div>
+      <div class="flex" style="gap:8px;margin-bottom:5px;font-size:7px">
+        <span><b style="color:#f59e0b">125</b> <span style="color:#4a5a7a">BUIDLs entered</span></span>
+        <span><b style="color:#a855f7">456</b> <span style="color:#4a5a7a">Hackers competing</span></span>
+        <span><b style="color:#00d4aa">#1</b> <span style="color:#4a5a7a">in Sovereign AI</span></span>
+        <span><b style="color:#ff4d6a">July 7</b> <span style="color:#4a5a7a">deadline</span></span>
+      </div>
       <div class="comp-scroll"><div class="comp-row header"><span>Feature</span><span>SafetyNet</span><span>Agent Casper</span><span>Chainleash</span><span>AgentPay</span></div>
       <div id="compRows"></div></div>
     </div>
@@ -627,6 +642,16 @@ function toast(msg,t='s'){
   const el=document.createElement('div');el.className='tst '+t;
   el.textContent=msg;c.appendChild(el);
   setTimeout(()=>el.remove(),2800);
+}
+
+function updateCountdown(){
+  const target=new Date('2026-07-07T23:59:59Z');
+  const now=new Date();
+  const diff=target-now;
+  if(diff<=0){document.getElementById('countdownTimer').textContent='\u23F1 Deadline Passed';return}
+  const d=Math.floor(diff/86400000);
+  const h=Math.floor((diff%86400000)/3600000);
+  document.getElementById('countdownTimer').textContent='\u23F1 '+d+'d '+h+'h';
 }
 
 async function api(path,opts={}){
@@ -1097,30 +1122,37 @@ function updateAfterCycle(result){
 function toggleFullscreen(){if(!document.fullscreenElement){document.documentElement.requestFullscreen()}else{document.exitFullscreen()}}
 
 // ─── SMART DEMO ─────────────────────────────────────────
+const DEMO_LABELS={overview:'Overview',ai:'AI Engine',paper:'Paper Trading',markets:'Markets',risk:'Risk Engine',x402:'x402 Payments',agents:'Sub-Agents',competition:'Competition',mcp:'MCP Server',tx:'Transactions'};
 function toggleDemo(){
   demoRunning=!demoRunning;const b=document.querySelector('.btn-gh[onclick*="toggleDemo"]');
+  const rd=document.getElementById('recDot');
+  const ds=document.getElementById('demoStep');
   if(demoRunning){
+    rd.classList.add('active');
     toast('Auto-demo started — showcasing all features','i');b.textContent='\u25A0';
     const seq=[
-      {t:'overview',action:()=>aiOnlyAnalysis(),delay:500},
-      {t:'ai',action:()=>{switchTab('ai');runAIAnalysis();setTimeout(initRadarChart,100)},delay:1500},
-      {t:'paper',action:()=>{switchTab('paper');runMultiple();setTimeout(()=>{fetchPaperData();fetchPaperTrades();fetchPaperHistory()},2000)},delay:2000},
-      {t:'markets',action:()=>switchTab('markets'),delay:600},
-      {t:'risk',action:()=>{switchTab('risk');setTimeout(()=>assessRisk(),200)},delay:1200},
-      {t:'x402',action:()=>{switchTab('x402');setTimeout(()=>makeX402Payment(),300);setTimeout(()=>makeX402Payment(),800)},delay:2000},
-      {t:'agents',action:()=>{switchTab('agents');loadSubAgents();fetchCoordinationLog();setTimeout(()=>switchTopology('parallel'),500);setTimeout(()=>switchTopology('consensus'),1000);setTimeout(()=>switchTopology('sequential'),1500)},delay:3500},
-      {t:'competition',action:()=>{switchTab('competition');fetchCompetitionData()},delay:800},
-      {t:'mcp',action:()=>switchTab('mcp'),delay:500},
-      {t:'tx',action:()=>switchTab('tx'),delay:500},
+      {t:'overview',action:()=>aiOnlyAnalysis(),delay:500,label:'Overview'},
+      {t:'ai',action:()=>{switchTab('ai');runAIAnalysis();setTimeout(initRadarChart,100)},delay:1500,label:'AI Engine'},
+      {t:'paper',action:()=>{switchTab('paper');runMultiple();setTimeout(()=>{fetchPaperData();fetchPaperTrades();fetchPaperHistory()},2000)},delay:2000,label:'Paper Trading'},
+      {t:'markets',action:()=>switchTab('markets'),delay:600,label:'Markets'},
+      {t:'risk',action:()=>{switchTab('risk');setTimeout(()=>assessRisk(),200)},delay:1200,label:'Risk Engine'},
+      {t:'x402',action:()=>{switchTab('x402');setTimeout(()=>makeX402Payment(),300);setTimeout(()=>makeX402Payment(),800)},delay:2000,label:'x402 Payments'},
+      {t:'agents',action:()=>{switchTab('agents');loadSubAgents();fetchCoordinationLog();setTimeout(()=>switchTopology('parallel'),500);setTimeout(()=>switchTopology('consensus'),1000);setTimeout(()=>switchTopology('sequential'),1500)},delay:3500,label:'Sub-Agents'},
+      {t:'competition',action:()=>{switchTab('competition');fetchCompetitionData()},delay:800,label:'Competition'},
+      {t:'mcp',action:()=>switchTab('mcp'),delay:500,label:'MCP Server'},
+      {t:'tx',action:()=>switchTab('tx'),delay:500,label:'Transactions'},
     ];
     let idx=0;
     const runStep=()=>{
       if(!demoRunning||idx>=seq.length){
         clearInterval(demoTimer);demoRunning=false;b.innerHTML='\u25B6';
+        rd.classList.remove('active');ds.classList.remove('active');
         toast('Demo tour complete — SafetyNet is ready','s');
         switchTab('overview');return
       }
       const step=seq[idx];
+      ds.textContent=(idx+1)+'/'+seq.length+' \u25B6 '+step.label;
+      ds.classList.add('active');
       switchTab(step.t);
       if(step.action){try{step.action()}catch(e){}}
       idx++;
@@ -1128,7 +1160,9 @@ function toggleDemo(){
     runStep();
     demoTimer=setInterval(runStep,5000);
   }else{
-    clearInterval(demoTimer);b.innerHTML='\u25B6';toast('Demo stopped','w')
+    clearInterval(demoTimer);b.innerHTML='\u25B6';
+    rd.classList.remove('active');ds.classList.remove('active');
+    toast('Demo stopped','w')
   }
 }
 
@@ -1148,6 +1182,7 @@ function stopPolling(){polling=false;if(pollTimer){clearInterval(pollTimer);poll
   await loadModelCards();await refreshAll();
   initRadarChart();updateRiskHeatmap();reloadAgentSystem();
   drawAgentFlow('sequential');
+  updateCountdown();setInterval(updateCountdown,60000);
   document.getElementById('topo-seq').className='btn btn-p btn-xs';
   setInterval(async()=>{await refreshStatus();await fetchLogs();await fetchPerf();await fetchTX();await fetchOpportunities();updatePerfChart()},3000);
   setInterval(async()=>{fetchGas();fetchPaperData();fetchPaperTrades();fetchPaperHistory()},8000);

@@ -38,3 +38,14 @@ Thumbs.db
 # Logs
 *.log
 logs/
+
+# Large media files (regenerate with scripts)
+*.mp4
+*.mp3
+*.wav
+*.webm
+*.avi
+*.mov
+
+# Temporary build files
+/tmp/

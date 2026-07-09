@@ -397,10 +397,21 @@ def ai_reason():
 
 # ─── Global Error Handler ─────────────────────────────────────
 
+@app.errorhandler(404)
+def not_found(e):
+    return jsonify({"error": "Not Found", "type": "NotFound"}), 404
+
+@app.errorhandler(405)
+def method_not_allowed(e):
+    return jsonify({"error": "Method Not Allowed", "type": "MethodNotAllowed"}), 405
+
 @app.errorhandler(Exception)
 def handle_all_errors(e):
+    code = getattr(e, 'code', 500)
+    if code in (404, 405):
+        return jsonify({"error": str(e), "type": type(e).__name__}), code
     add_log("ERROR", f"Unhandled: {type(e).__name__}: {e}")
-    return jsonify({"error": str(e), "type": type(e).__name__}), 500
+    return jsonify({"error": str(e), "type": type(e).__name__}), code
 
 
 # ─── Competition Comparison ─────────────────────────────────

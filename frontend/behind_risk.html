@@ -1,0 +1,55 @@
+<!DOCTYPE html><html><head><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#02050e;color:#e4eaf2;font-family:'SF Mono','Fira Code',monospace;width:1920px;height:1080px;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.container{width:1600px;padding:40px}
+.title{font-size:14px;color:#4a5a7a;text-transform:uppercase;letter-spacing:6px;margin-bottom:30px;text-align:center}
+.heading{font-size:42px;font-weight:800;background:linear-gradient(135deg,#00d4aa,#fbbf24);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:40px}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px}
+.card{padding:24px;border-radius:12px;border:1px solid rgba(26,37,64,.3);background:rgba(4,9,20,.7)}
+.card h3{font-size:12px;color:#4a5a7a;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px}
+.meter{height:8px;background:rgba(26,37,64,.3);border-radius:4px;margin:8px 0;overflow:hidden}
+.meter .fill{height:100%;border-radius:4px}
+.val{font-size:28px;font-weight:700;margin-bottom:4px}
+.sub{font-size:10px;color:#4a5a7a}
+.row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(26,37,64,.15);font-size:11px}
+.row .lbl{color:#586078}.row .v{font-weight:600}
+.safe{color:#00d4aa}.warn{color:#fbbf24}.danger{color:#ff4d6a}
+.btm{display:flex;justify-content:space-between;margin-top:30px;font-size:11px;color:#3a4a6a}
+.btm .hl{color:#00d4aa;font-weight:600}
+</style></head><body>
+<div class="container">
+  <div class="title">Risk Engine</div>
+  <div class="heading">Multi-Layer Guardrails — Every Trade Vetted</div>
+  <div class="grid">
+    <div class="card">
+      <h3>Slippage Risk</h3>
+      <div class="val safe">0.3%</div>
+      <div class="meter"><div class="fill" style="width:3%;background:#00d4aa"></div></div>
+      <div class="row"><span class="lbl">Pool Depth</span><span class="v">$1.2M TVL</span></div>
+      <div class="row"><span class="lbl">Trade Size</span><span class="v">$500</span></div>
+      <div class="row"><span class="lbl">Max Tolerable</span><span class="v">2.0%</span></div>
+    </div>
+    <div class="card">
+      <h3>Impermanent Loss</h3>
+      <div class="val safe">1.2%</div>
+      <div class="meter"><div class="fill" style="width:12%;background:#00d4aa"></div></div>
+      <div class="row"><span class="lbl">Volatility</span><span class="v">3.5% daily</span></div>
+      <div class="row"><span class="lbl">Time Horizon</span><span class="v">7 days</span></div>
+      <div class="row"><span class="lbl">IL Threshold</span><span class="v">5.0%</span></div>
+    </div>
+    <div class="card">
+      <h3>Circuit Breakers</h3>
+      <div class="val safe">ACTIVE</div>
+      <div class="meter"><div class="fill" style="width:100%;background:#00d4aa"></div></div>
+      <div class="row"><span class="lbl">Max Drawdown</span><span class="v">5% trigger</span></div>
+      <div class="row"><span class="lbl">Consecutive Losses</span><span class="v">3 → pause</span></div>
+      <div class="row"><span class="lbl">Contract Whitelist</span><span class="v">5 approved</span></div>
+    </div>
+  </div>
+  <div class="btm">
+    <span><span class="hl">Decision:</span> SAFE — proceed with yield_optimizer</span>
+    <span><span class="hl">Overall risk:</span> 12/100</span>
+    <span><span class="hl">Recommendation:</span> Execute at 15.0% allocation</span>
+  </div>
+</div>
+</body></html>
